@@ -1,0 +1,7 @@
+with open("file.txt", "w") as file:
+    file.write("A apel\n")
+    file.write("P pisang\n")
+    file.write("J jeruk\n")
+
+with open("file.txt", "r") as file:
+    print(file.read())
