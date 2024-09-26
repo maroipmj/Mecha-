@@ -23,9 +23,3 @@ def baca_file_dict(file):
         
     return dict_data
 
-# Contoh penggunaan
-filename = 'data.txt'  # Ganti dengan nama file yang sesuai
-data_dict = baca_file_dict(filename)
-
-# Menampilkan data yang terbaca
-print(data_dict)
