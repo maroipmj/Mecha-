@@ -2,22 +2,22 @@ import os
 from file_array import baca_file_array
 from file_dict import baca_file_dict
 
-def pilih_format_dan_baca(file):
-    # Memilih format dan membaca file
-    print("Pilih format file yang akan dibaca:")
-    print("1. Array")
-    print("2. Dictionary")
-    pilihan = input("Masukkan pilihan (1/2): ")
+def deteksi_format_dan_baca(file):
+    # Membaca file dan mendeteksi formatnya (array atau dictionary)
+    with open(file, mode='r', encoding='utf-8') as f:
+        content = f.read().strip()
 
-    if pilihan == '1':
-        # Membaca file sebagai array
-        return baca_file_array(file)
-    elif pilihan == '2':
-        # Membaca file sebagai dictionary
-        return baca_file_dict(file)
-    else:
-        print("Pilihan tidak valid.")
-        return None
+        # Deteksi apakah file berformat dictionary
+        if '=>' in content or ':' in content:
+            print("Format file terdeteksi sebagai Dictionary.")
+            return baca_file_dict(file)
+        # Jika tidak ada pemisah dictionary, dianggap format array
+        elif ',' in content or '\n' in content:
+            print("Format file terdeteksi sebagai Array.")
+            return baca_file_array(file)
+        else:
+            print("Format file tidak dikenali.")
+            return None
 
 def main():
     while True:
@@ -27,8 +27,8 @@ def main():
             print(f"File '{filename}' tidak ditemukan. Silakan masukkan nama file yang benar.")
             continue
 
-        # Jika file ditemukan, tentukan format dan baca file
-        result = pilih_format_dan_baca(filename)
+        # Jika file ditemukan, deteksi format dan baca file
+        result = deteksi_format_dan_baca(filename)
 
         if result:
             print("Isi file yang dibaca:")
