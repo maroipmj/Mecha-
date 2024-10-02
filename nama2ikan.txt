@@ -1,4 +1,0 @@
-pancong:1:4
-acong:2:3
-cuka:4:1
-tikus:3:4
