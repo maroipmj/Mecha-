@@ -1,0 +1,4 @@
+Pancong:1;2
+Acong:3:1
+Cuka:4:3
+Tikus2:1
