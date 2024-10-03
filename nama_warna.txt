@@ -1,0 +1,4 @@
+1:merah
+2:hijau
+3:ungu
+4:hitam
