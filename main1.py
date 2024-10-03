@@ -1,132 +1,152 @@
 import os
 
-# Fungsi untuk membaca data dari file dan mengubahnya menjadi dictionary
-def baca_file_dict(file):
-    data_dict = {}
-    if not os.path.exists(file):
+class DataIkan:
+    def __init__(self, nama_file, jenis_file, warna_file):
+        self.nama_file = nama_file
+        self.jenis_file = jenis_file
+        self.warna_file = warna_file
+        
+        # Membaca data dari file saat inisialisasi
+        self.nama_data = self.baca_file_dict(self.nama_file)
+        self.jenis_data = self.baca_file_dict(self.jenis_file)
+        self.warna_data = self.baca_file_dict(self.warna_file)
+
+    # Fungsi untuk membaca data dari file dan mengubahnya menjadi dictionary
+    def baca_file_dict(self, file):
+        data_dict = {}
+        if not os.path.exists(file):
+            return data_dict
+
+        with open(file, 'r', encoding='utf-8') as f:
+            for line in f:
+                # Menggunakan .split untuk memisahkan key dan value
+                parts = line.strip().split(':', 1)
+                if len(parts) == 2:  # Pastikan ada dua bagian
+                    key, value = parts
+                    data_dict[key.strip()] = value.strip()
+        
         return data_dict
 
-    with open(file, 'r', encoding='utf-8') as f:
-        for line in f:
-            key, value = line.strip().split(':', 1)
-            data_dict[key.strip()] = value.strip()
-    
-    return data_dict
+    # Fungsi untuk menyimpan dictionary ke file
+    def simpan_file_dict(self, file, data):
+        with open(file, 'w', encoding='utf-8') as f:
+            for key, value in data.items():
+                f.write(f"{key}:{value}\n")
 
-# Fungsi untuk menyimpan dictionary ke file
-def simpan_file_dict(file, data):
-    with open(file, 'w', encoding='utf-8') as f:
-        for key, value in data.items():
-            f.write(f"{key}:{value}\n")
+    # Fungsi untuk menanyakan data apa yang ingin dilihat
+    def lihat_data(self):
+        print("Data apa yang ingin Anda lihat?")
+        print("1. Nama Ikan")
+        print("2. Jenis Ikan")
+        print("3. Warna Ikan")
+        pilihan = input("Pilih opsi (1-3): ")
 
-# Fungsi untuk melihat data dari ketiga file
-def lihat_data(nama_data, jenis_data, warna_data):
-    ids = nama_data.keys()
-    for id_ikan in ids:
-        nama_ikan = nama_data.get(id_ikan, "Tidak Ditemukan")
-        jenis_ikan = jenis_data.get(id_ikan, "Tidak Ditemukan")
-        warna_ikan = warna_data.get(id_ikan, "Tidak Ditemukan")
+        if pilihan == '1':
+            print("\nData Nama Ikan:")
+            for id_ikan, nama_ikan in self.nama_data.items():
+                print(f"{id_ikan}: {nama_ikan}")
+        elif pilihan == '2':
+            print("\nData Jenis Ikan:")
+            for id_ikan, jenis_ikan in self.jenis_data.items():
+                print(f"{id_ikan}: {jenis_ikan}")
+        elif pilihan == '3':
+            print("\nData Warna Ikan:")
+            for id_ikan, warna_ikan in self.warna_data.items():
+                print(f"{id_ikan}: {warna_ikan}")
+        else:
+            print("Pilihan tidak valid.")
 
-        # Menampilkan output dalam format yang diinginkan
-        print(f"{id_ikan}.{nama_ikan}:{jenis_ikan}:{warna_ikan}")
+    # Fungsi untuk menambah data
+    def tambah_data(self):
+        id_ikan = str(len(self.nama_data) + 1)  # ID baru otomatis
+        nama_ikan = input("Masukkan nama ikan: ")
 
-# Fungsi untuk menambah data ke tiga file
-def tambah_data(nama_file, jenis_file, warna_file, nama_data, jenis_data, warna_data):
-    id_ikan = str(len(nama_data) + 1)  # ID baru otomatis
-    nama_ikan = input("Masukkan nama ikan: ")
-
-    # Tampilkan pilihan jenis ikan
-    print("Kode jenis ikan yang tersedia:")
-    for key, value in jenis_data.items():
-        print(f"{key}: {value}")
-    
-    jenis_ikan = input("Masukkan kode jenis ikan: ")
-
-    # Tampilkan pilihan warna ikan
-    print("Kode warna ikan yang tersedia:")
-    for key, value in warna_data.items():
-        print(f"{key}: {value}")
-    
-    warna_ikan = input("Masukkan kode warna ikan: ")
-
-    # Validasi input
-    if jenis_ikan not in jenis_data or warna_ikan not in warna_data:
-        print("Jenis atau warna ikan tidak valid. Silakan coba lagi.")
-        return
-
-    # Simpan data
-    nama_data[id_ikan] = nama_ikan
-    jenis_data[id_ikan] = jenis_data[jenis_ikan]
-    warna_data[id_ikan] = warna_data[warna_ikan]
-
-    simpan_file_dict(nama_file, nama_data)
-    simpan_file_dict(jenis_file, jenis_data)
-    simpan_file_dict(warna_file, warna_data)
-
-    print(f"Data ikan dengan ID {id_ikan} berhasil ditambahkan!")
-
-# Fungsi untuk mengedit data yang sudah ada
-def edit_data(nama_file, jenis_file, warna_file, nama_data, jenis_data, warna_data):
-    lihat_data(nama_data, jenis_data, warna_data)
-    id_ikan = input("Masukkan ID ikan yang ingin diedit: ")
-
-    if id_ikan in nama_data:
-        nama_ikan = input(f"Nama baru ({nama_data[id_ikan]}): ") or nama_data[id_ikan]
-        
+        # Tampilkan pilihan jenis ikan
         print("Kode jenis ikan yang tersedia:")
-        for key, value in jenis_data.items():
+        for key, value in self.jenis_data.items():
             print(f"{key}: {value}")
-        jenis_ikan = input("Masukkan kode jenis ikan baru: ")
+        
+        jenis_ikan = input("Masukkan kode jenis ikan: ")
 
+        # Tampilkan pilihan warna ikan
         print("Kode warna ikan yang tersedia:")
-        for key, value in warna_data.items():
+        for key, value in self.warna_data.items():
             print(f"{key}: {value}")
-        warna_ikan = input("Masukkan kode warna ikan baru: ")
+        
+        warna_ikan = input("Masukkan kode warna ikan: ")
 
         # Validasi input
-        if jenis_ikan not in jenis_data or warna_ikan not in warna_data:
+        if jenis_ikan not in self.jenis_data or warna_ikan not in self.warna_data:
             print("Jenis atau warna ikan tidak valid. Silakan coba lagi.")
             return
 
-        # Perbarui data
-        nama_data[id_ikan] = nama_ikan
-        jenis_data[id_ikan] = jenis_data[jenis_ikan]
-        warna_data[id_ikan] = warna_data[warna_ikan]
+        # Simpan data
+        self.nama_data[id_ikan] = nama_ikan
+        self.jenis_data[id_ikan] = self.jenis_data[jenis_ikan]
+        self.warna_data[id_ikan] = self.warna_data[warna_ikan]
 
-        simpan_file_dict(nama_file, nama_data)
-        simpan_file_dict(jenis_file, jenis_data)
-        simpan_file_dict(warna_file, warna_data)
-        print(f"Data ikan dengan ID {id_ikan} berhasil diperbarui!")
-    else:
-        print("ID tidak ditemukan.")
+        self.simpan_file_dict(self.nama_file, self.nama_data)
+        self.simpan_file_dict(self.jenis_file, self.jenis_data)
+        self.simpan_file_dict(self.warna_file, self.warna_data)
 
-# Fungsi untuk menghapus data berdasarkan ID
-def hapus_data(nama_file, jenis_file, warna_file, nama_data, jenis_data, warna_data):
-    lihat_data(nama_data, jenis_data, warna_data)
-    id_ikan = input("Masukkan ID ikan yang ingin dihapus: ")
+        print(f"Data ikan dengan ID {id_ikan} berhasil ditambahkan!")
 
-    if id_ikan in nama_data:
-        del nama_data[id_ikan]
-        del jenis_data[id_ikan]
-        del warna_data[id_ikan]
+    # Fungsi untuk mengedit data ikan
+    def edit_data(self):
+        self.lihat_data()
+        id_ikan = input("Masukkan ID ikan yang ingin diedit: ")
 
-        simpan_file_dict(nama_file, nama_data)
-        simpan_file_dict(jenis_file, jenis_data)
-        simpan_file_dict(warna_file, warna_data)
-        print(f"Data ikan dengan ID {id_ikan} berhasil dihapus!")
-    else:
-        print("ID tidak ditemukan.")
+        if id_ikan in self.nama_data:
+            nama_ikan = input(f"Nama baru ({self.nama_data[id_ikan]}): ") or self.nama_data[id_ikan]
+            
+            print("Kode jenis ikan yang tersedia:")
+            for key, value in self.jenis_data.items():
+                print(f"{key}: {value}")
+            jenis_ikan = input("Masukkan kode jenis ikan baru: ")
+
+            print("Kode warna ikan yang tersedia:")
+            for key, value in self.warna_data.items():
+                print(f"{key}: {value}")
+            warna_ikan = input("Masukkan kode warna ikan baru: ")
+
+            # Validasi input
+            if jenis_ikan not in self.jenis_data or warna_ikan not in self.warna_data:
+                print("Jenis atau warna ikan tidak valid. Silakan coba lagi.")
+                return
+
+            # Perbarui data
+            self.nama_data[id_ikan] = nama_ikan
+            self.jenis_data[id_ikan] = self.jenis_data[jenis_ikan]
+            self.warna_data[id_ikan] = self.warna_data[warna_ikan]
+
+            self.simpan_file_dict(self.nama_file, self.nama_data)
+            self.simpan_file_dict(self.jenis_file, self.jenis_data)
+            self.simpan_file_dict(self.warna_file, self.warna_data)
+            print(f"Data ikan dengan ID {id_ikan} berhasil diperbarui!")
+        else:
+            print("ID tidak ditemukan.")
+
+    # Fungsi untuk menghapus data ikan
+    def hapus_data(self):
+        self.lihat_data()
+        id_ikan = input("Masukkan ID ikan yang ingin dihapus: ")
+
+        if id_ikan in self.nama_data:
+            del self.nama_data[id_ikan]
+            del self.jenis_data[id_ikan]
+            del self.warna_data[id_ikan]
+
+            self.simpan_file_dict(self.nama_file, self.nama_data)
+            self.simpan_file_dict(self.jenis_file, self.jenis_data)
+            self.simpan_file_dict(self.warna_file, self.warna_data)
+            print(f"Data ikan dengan ID {id_ikan} berhasil dihapus!")
+        else:
+            print("ID tidak ditemukan.")
 
 # Fungsi utama untuk menjalankan program
 def main():
-    nama_file = 'nama_ikan.txt'
-    jenis_file = 'jenis_ikan.txt'
-    warna_file = 'warna_ikan.txt'
-
-    # Baca data dari file
-    nama_data = baca_file_dict(nama_file)
-    jenis_data = baca_file_dict(jenis_file)
-    warna_data = baca_file_dict(warna_file)
+    # Membuat instance dari class DataIkan
+    data_ikan = DataIkan('nama_ikan.txt', 'nama_jenis.txt', 'nama_warna.txt')
 
     while True:
         print("\nMenu:")
@@ -138,13 +158,13 @@ def main():
         pilihan = input("Pilih opsi (1-5): ")
 
         if pilihan == '1':
-            lihat_data(nama_data, jenis_data, warna_data)
+            data_ikan.lihat_data()
         elif pilihan == '2':
-            tambah_data(nama_file, jenis_file, warna_file, nama_data, jenis_data, warna_data)
+            data_ikan.tambah_data()
         elif pilihan == '3':
-            edit_data(nama_file, jenis_file, warna_file, nama_data, jenis_data, warna_data)
+            data_ikan.edit_data()
         elif pilihan == '4':
-            hapus_data(nama_file, jenis_file, warna_file, nama_data, jenis_data, warna_data)
+            data_ikan.hapus_data()
         elif pilihan == '5':
             print("Terima kasih. Program selesai.")
             break
