@@ -19,7 +19,6 @@ class DataIkan:
 
         with open(file, 'r', encoding='utf-8') as f:
             for line in f:
-                # Menggunakan .split untuk memisahkan key dan value
                 parts = line.strip().split(':', 1)
                 if len(parts) == 2:  # Pastikan ada dua bagian
                     key, value = parts
@@ -85,6 +84,7 @@ class DataIkan:
         self.jenis_data[id_ikan] = self.jenis_data[jenis_ikan]
         self.warna_data[id_ikan] = self.warna_data[warna_ikan]
 
+        # Simpan masing-masing data ke file yang sesuai
         self.simpan_file_dict(self.nama_file, self.nama_data)
         self.simpan_file_dict(self.jenis_file, self.jenis_data)
         self.simpan_file_dict(self.warna_file, self.warna_data)

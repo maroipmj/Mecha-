@@ -1,4 +1,4 @@
 1:pancong
 2:acong
-3:cuka
 4:tikus
+5:mama
