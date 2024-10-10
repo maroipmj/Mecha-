@@ -1,7 +1,7 @@
 import os
 
 class DataIkan:
-    def _init_(self, nama_file, jenis_file, warna_file):
+    def init(self, nama_file, jenis_file, warna_file):
         self.nama_file = nama_file
         self.jenis_file = jenis_file
         self.warna_file = warna_file
@@ -171,5 +171,5 @@ def main():
         else:
             print("Pilihan tidak valid.")
 
-if _name_ == "_main_":
+if __name__ == "main":
     main()
