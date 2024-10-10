@@ -1,4 +1,2 @@
-1:koi
 2:lele
-4:arwana
-5:arwana
+4:koi
