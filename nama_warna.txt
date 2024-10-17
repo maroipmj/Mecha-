@@ -1,4 +1,2 @@
-1:merah
+1:putih
 2:hijau
-4:hitam
-5:merah

@@ -1,4 +1,2 @@
-1:pancong
+1:utin
 2:acong
-4:tikus
-5:mama

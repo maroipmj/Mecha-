@@ -1,0 +1,3 @@
+ID:Nama:Warna:Jenis
+1:roma:1:2
+2:rama:4:2
