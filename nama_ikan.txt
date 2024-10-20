@@ -1,2 +1,6 @@
+nama ikan
+
 1:utin
 2:acong
+4:tikus
+5:den

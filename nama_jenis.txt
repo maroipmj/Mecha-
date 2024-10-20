@@ -1,1 +1,6 @@
+jenis ikan
+
+1.koi
 2:lele
+3.hiu 
+4.nemo

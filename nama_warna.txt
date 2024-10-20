@@ -1,2 +1,6 @@
+warna ikan
+
 1:putih
 2:hijau
+3.pink
+4.merah
