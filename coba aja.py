@@ -20,6 +20,10 @@ def tampilkan_header(window, title):
     header_label = tk.Label(window, text=title, font=("Arial", 16), bg="#003366", fg="white")
     header_label.pack(pady=10)
 
+# Fungsi untuk keluar dari window
+def keluar(window):
+    window.destroy()
+
 # Halaman untuk menampilkan data ikan
 def halaman_tampilkan_data_ikan():
     tampil_window = tk.Toplevel(root)
@@ -59,6 +63,10 @@ def halaman_tampilkan_data_ikan():
     tombol_tampil = tk.Button(tampil_window, text="Tampilkan Data", command=tampil_data, bg="white", fg="black")
     tombol_tampil.pack(pady=10)
 
+    # Tombol keluar
+    tombol_keluar = tk.Button(tampil_window, text="Keluar", command=lambda: keluar(tampil_window), bg="red", fg="white")
+    tombol_keluar.pack(pady=10)
+
 # Halaman untuk edit data ikan
 def halaman_edit_data():
     edit_window = tk.Toplevel(root)
@@ -67,7 +75,7 @@ def halaman_edit_data():
 
     label_edit = tk.Label(edit_window, text="Pilih Data Ikan yang ingin diedit:", bg="#003366", fg="white")
     label_edit.grid(row=0, column=0, padx=10, pady=5)
-    
+
     dropdown_edit = ttk.Combobox(edit_window)
     dropdown_edit['values'] = ["Nama Ikan", "Jenis Ikan", "Warna Ikan", "Jarak Tempuh"]
     dropdown_edit.grid(row=0, column=1, padx=10, pady=5)
@@ -124,6 +132,10 @@ def halaman_edit_data():
 
     edit_button = tk.Button(edit_window, text="Edit Data Ikan", command=edit_data, bg="white", fg="black")
     edit_button.grid(row=3, columnspan=2, pady=10)
+
+    # Tombol keluar
+    tombol_keluar = tk.Button(edit_window, text="Keluar", command=lambda: keluar(edit_window), bg="red", fg="white")
+    tombol_keluar.grid(row=4, columnspan=2, pady=10)
 
 # Halaman untuk hapus data ikan
 def halaman_hapus_data():
@@ -184,19 +196,88 @@ def halaman_hapus_data():
     hapus_button = tk.Button(hapus_window, text="Hapus Data Ikan", command=hapus_data, bg="white", fg="black")
     hapus_button.grid(row=2, columnspan=2, pady=10)
 
-# Menginisialisasi aplikasi
+    # Tombol keluar
+    tombol_keluar = tk.Button(hapus_window, text="Keluar", command=lambda: keluar(hapus_window), bg="red", fg="white")
+    tombol_keluar.grid(row=3, columnspan=2, pady=10)
+
+# Halaman untuk tambah data ikan
+def halaman_tambah_data():
+    tambah_window = tk.Toplevel(root)
+    tambah_window.title("Tambah Data Ikan")
+    tambah_window.configure(bg="#003366")
+
+    label_tambah = tk.Label(tambah_window, text="Pilih Data Ikan yang ingin ditambah:", bg="#003366", fg="white")
+    label_tambah.grid(row=0, column=0, padx=10, pady=5)
+
+    dropdown_tambah = ttk.Combobox(tambah_window)
+    dropdown_tambah['values'] = ["Nama Ikan", "Jenis Ikan", "Warna Ikan", "Jarak Tempuh"]
+    dropdown_tambah.grid(row=0, column=1, padx=10, pady=5)
+
+    label_data_baru = tk.Label(tambah_window, text="Data Baru:", bg="#003366", fg="white")
+    label_data_baru.grid(row=1, column=0, padx=10, pady=5)
+
+    entry_data_baru = tk.Entry(tambah_window)
+    entry_data_baru.grid(row=1, column=1, padx=10, pady=5)
+
+    def tambah_data():
+        data_baru = entry_data_baru.get()
+
+        if data_baru:
+            if dropdown_tambah.get() == "Nama Ikan":
+                nama_ikan = baca_file('nama_ikan.txt')
+                nama_ikan.append([data_baru])
+                tulis_file('nama_ikan.txt', nama_ikan)
+            elif dropdown_tambah.get() == "Jenis Ikan":
+                jenis_ikan = baca_file('nama_jenis.txt')
+                jenis_ikan.append([data_baru])
+                tulis_file('nama_jenis.txt', jenis_ikan)
+            elif dropdown_tambah.get() == "Warna Ikan":
+                warna_ikan = baca_file('nama_warna.txt')
+                warna_ikan.append([data_baru])
+                tulis_file('nama_warna.txt', warna_ikan)
+            elif dropdown_tambah.get() == "Jarak Tempuh":
+                kecepatan, waktu, jarak = data_baru.split(',')
+                jarak_tempuh = baca_file('jarak_tempuh.txt')
+                jarak_tempuh.append([kecepatan, waktu, jarak])
+                tulis_file('jarak_tempuh.txt', jarak_tempuh)
+
+            messagebox.showinfo("Sukses", "Data berhasil ditambahkan!")
+        else:
+            messagebox.showwarning("Peringatan", "Isi data yang ingin ditambah!")
+
+    tambah_button = tk.Button(tambah_window, text="Tambah Data Ikan", command=tambah_data, bg="white", fg="black")
+    tambah_button.grid(row=2, columnspan=2, pady=10)
+
+    # Tombol keluar
+    tombol_keluar = tk.Button(tambah_window, text="Keluar", command=lambda: keluar(tambah_window), bg="red", fg="white")
+    tombol_keluar.grid(row=3, columnspan=2, pady=10)
+
+# Inisialisasi GUI utama
 root = tk.Tk()
 root.title("Aplikasi Data Ikan")
+root.geometry("400x400")
 root.configure(bg="#003366")
 
-# Tombol untuk membuka halaman masing-masing
+# Judul aplikasi
+judul_label = tk.Label(root, text="Aplikasi Data Ikan", font=("Arial", 20), bg="#003366", fg="white")
+judul_label.pack(pady=20)
+
+# Tombol-tombol menu utama
 tombol_tampil = tk.Button(root, text="Tampilkan Data Ikan", command=halaman_tampilkan_data_ikan, bg="white", fg="black")
 tombol_tampil.pack(pady=10)
 
 tombol_edit = tk.Button(root, text="Edit Data Ikan", command=halaman_edit_data, bg="white", fg="black")
 tombol_edit.pack(pady=10)
 
+tombol_tambah = tk.Button(root, text="Tambah Data Ikan", command=halaman_tambah_data, bg="white", fg="black")
+tombol_tambah.pack(pady=10)
+
 tombol_hapus = tk.Button(root, text="Hapus Data Ikan", command=halaman_hapus_data, bg="white", fg="black")
 tombol_hapus.pack(pady=10)
 
+# Tombol keluar
+tombol_keluar = tk.Button(root, text="Keluar", command=root.quit, bg="red", fg="white")
+tombol_keluar.pack(pady=20)
+
+# Menjalankan aplikasi
 root.mainloop()

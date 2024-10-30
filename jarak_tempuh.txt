@@ -1,0 +1,5 @@
+kecepatan , waktu , jarak
+
+Kecepatan: 2 m/s, Waktu: 10 detik, Jarak: 20.00 meter
+Kecepatan: 1.5 m/s, Waktu: 30 detik, Jarak: 45.00 meter
+Kecepatan: 3 m/s, Waktu: 15 detik, Jarak: 45.00 meter
