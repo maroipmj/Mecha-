@@ -1,1 +1,4 @@
-2:lele
+ID_jenis
+hiu
+lele
+koi

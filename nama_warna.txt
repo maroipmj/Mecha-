@@ -1,2 +1,4 @@
-1:putih
-2:hijau
+ID_warna
+merah
+biru
+putih

@@ -15,22 +15,56 @@ def tulis_file(file_path, data):
         for item in data:
             f.write(item + '\n')
 
-# Fungsi untuk menampilkan halaman dengan data lengkap (ID, Nama, Warna, Jenis)
+# Fungsi untuk menampilkan halaman dengan data sesuai pilihan dari dropdown (Nama, Warna, Jenis)
 def tampilkan_data_ikan():
+    # Membuat jendela baru untuk menampilkan data ikan
     tampil_window = tk.Toplevel(root)
     tampil_window.title("Tampilkan Data Ikan")
     tampil_window.configure(bg="#003366")
     
+    # Label untuk pilihan filter data
+    label_pilih = tk.Label(tampil_window, text="Pilih Data yang Ingin Dilihat:", bg="#003366", fg="white")
+    label_pilih.pack(pady=10)
+    
+    # Dropdown untuk memilih data yang ingin ditampilkan
+    dropdown_pilihan = ttk.Combobox(tampil_window, state="readonly")
+    dropdown_pilihan['values'] = ["Semua Data", "Nama Ikan", "Warna Ikan", "Jenis Ikan"]
+    dropdown_pilihan.current(0)  # Set pilihan default ke "Semua Data"
+    dropdown_pilihan.pack(pady=5)
+    
+    # Listbox untuk menampilkan hasil data ikan
     ikan_listbox = tk.Listbox(tampil_window, width=80, height=10)
     ikan_listbox.pack(pady=20)
 
-    nama_ikan = baca_file('nama_ikan.txt')
-    warna_ikan = baca_file('nama_warna.txt')
-    jenis_ikan = baca_file('nama_jenis.txt')
+    # Fungsi untuk menampilkan data sesuai pilihan dropdown
+    def tampilkan_berdasarkan_pilihan():
+        pilihan = dropdown_pilihan.get()
 
-    # Tampilkan data secara lengkap
-    for i in range(len(nama_ikan)):
-        ikan_listbox.insert(tk.END, f"ID: {i + 1}, Nama: {nama_ikan[i]}, Warna: {warna_ikan[i]}, Jenis: {jenis_ikan[i]}")
+        # Kosongkan listbox sebelum menampilkan data baru
+        ikan_listbox.delete(0, tk.END)
+
+        # Membaca file data ikan
+        nama_ikan = baca_file('nama_ikan.txt')
+        warna_ikan = baca_file('nama_warna.txt')
+        jenis_ikan = baca_file('nama_jenis.txt')
+
+        # Tampilkan data sesuai pilihan pengguna
+        if pilihan == "Semua Data":
+            for i in range(len(nama_ikan)):
+                ikan_listbox.insert(tk.END, f"ID: {i + 1}, Nama: {nama_ikan[i]}, Warna: {warna_ikan[i]}, Jenis: {jenis_ikan[i]}")
+        elif pilihan == "Nama Ikan":
+            for i in range(len(nama_ikan)):
+                ikan_listbox.insert(tk.END, f"ID: {i + 1}, Nama: {nama_ikan[i]}")
+        elif pilihan == "Warna Ikan":
+            for i in range(len(warna_ikan)):
+                ikan_listbox.insert(tk.END, f"ID: {i + 1}, Warna: {warna_ikan[i]}")
+        elif pilihan == "Jenis Ikan":
+            for i in range(len(jenis_ikan)):
+                ikan_listbox.insert(tk.END, f"ID: {i + 1}, Jenis: {jenis_ikan[i]}")
+
+    # Tombol untuk memulai penampilan data sesuai pilihan dropdown
+    tampilkan_button = tk.Button(tampil_window, text="Tampilkan Data", command=tampilkan_berdasarkan_pilihan, font=("Arial", 12), width=20, bg="white", fg="black")
+    tampilkan_button.pack(pady=10)
 
 # Halaman untuk menambah data ikan dengan auto increment
 def halaman_tambah_data():
@@ -137,81 +171,31 @@ def halaman_edit_data():
                 tulis_file('nama_warna.txt', warna_ikan)
                 tulis_file('nama_jenis.txt', jenis_ikan)
 
-                messagebox.showinfo("Sukses", "Data ikan berhasil diperbarui!")
+                messagebox.showinfo("Sukses", f"Data ikan ID {id_ikan + 1} berhasil diperbarui!")
             else:
-                messagebox.showwarning("Peringatan", "ID tidak valid!")
+                messagebox.showerror("Error", "ID Ikan tidak valid!")
         except ValueError:
-            messagebox.showwarning("Peringatan", "Masukkan ID yang valid!")
+            messagebox.showerror("Error", "Masukkan ID yang valid!")
 
     simpan_button = tk.Button(edit_window, text="Simpan Perubahan", command=simpan_perubahan, font=("Arial", 12), width=20, bg="white", fg="black")
     simpan_button.grid(row=4, columnspan=2, pady=10)
 
-# Halaman untuk menghitung jarak tempuh ikan
-def tulis_jarak_tempuh(file_path, kecepatan, waktu, jarak):
-    with open(file_path, 'a') as f:  # 'a' mode untuk append data baru
-        f.write(f"Kecepatan: {kecepatan} m/s, Waktu: {waktu} detik, Jarak: {jarak:.2f} meter\n")
-
-def halaman_hitung_jarak():
-    jarak_window = tk.Toplevel(root)
-    jarak_window.title("Hitung Jarak Tempuh Ikan")
-    jarak_window.configure(bg="#003366")
-
-    label_kecepatan = tk.Label(jarak_window, text="Kecepatan Ikan (m/s):", bg="#003366", fg="white")
-    label_kecepatan.grid(row=0, column=0, padx=10, pady=5)
-    entry_kecepatan = tk.Entry(jarak_window)
-    entry_kecepatan.grid(row=0, column=1, padx=10, pady=5)
-
-    label_waktu = tk.Label(jarak_window, text="Waktu Berenang (detik):", bg="#003366", fg="white")
-    label_waktu.grid(row=1, column=0, padx=10, pady=5)
-    entry_waktu = tk.Entry(jarak_window)
-    entry_waktu.grid(row=1, column=1, padx=10, pady=5)
-
-    def hitung_jarak():
-        try:
-            kecepatan = float(entry_kecepatan.get())
-            waktu = float(entry_waktu.get())
-            if kecepatan >= 0 and waktu >= 0:
-                jarak = kecepatan * waktu
-                messagebox.showinfo("Hasil", f"Jarak tempuh ikan: {jarak:.2f} meter")
-                
-                # Simpan hasil ke file
-                tulis_jarak_tempuh('data_jarak_tempuh.txt', kecepatan, waktu, jarak)
-            else:
-                messagebox.showwarning("Peringatan", "Kecepatan dan waktu harus bernilai positif!")
-        except ValueError:
-            messagebox.showwarning("Peringatan", "Masukkan nilai numerik yang valid!")
-
-    hitung_button = tk.Button(jarak_window, text="Hitung Jarak", command=hitung_jarak, font=("Arial", 12), width=20, bg="white", fg="black")
-    hitung_button.grid(row=2, columnspan=2, pady=10)
-
-# Fungsi untuk menutup aplikasi
-def keluar_aplikasi():
-    root.quit()
-
-# Setup jendela utama
+# Halaman Utama
 root = tk.Tk()
-root.title("Aplikasi Data Ikan")
-root.geometry("400x500")
+root.title("Sistem Manajemen Data Ikan")
+root.geometry("500x400")
 root.configure(bg="#003366")
 
-headline_label = tk.Label(root, text="Data Ikan", bg="#003366", fg="white", font=("Arial", 20))
-headline_label.pack(pady=20)
+label_title = tk.Label(root, text="Sistem Manajemen Data Ikan", bg="#003366", fg="white", font=("Arial", 16))
+label_title.pack(pady=20)
 
-# Tombol utama
-tampil_button = tk.Button(root, text="Tampilkan Data Ikan", command=tampilkan_data_ikan, font=("Arial", 12), width=20, bg="white", fg="black")
-tampil_button.pack(pady=10)
-
-tambah_button = tk.Button(root, text="Tambah Data Ikan", command=halaman_tambah_data, font=("Arial", 12), width=20, bg="white", fg="black")
+tambah_button = tk.Button(root, text="Tambah Data Ikan", command=halaman_tambah_data, font=("Arial", 12), width=30, bg="white", fg="black")
 tambah_button.pack(pady=10)
 
-edit_button = tk.Button(root, text="Edit Data Ikan", command=halaman_edit_data, font=("Arial", 12), width=20, bg="white", fg="black")
+tampil_button = tk.Button(root, text="Tampilkan Data Ikan", command=tampilkan_data_ikan, font=("Arial", 12), width=30, bg="white", fg="black")
+tampil_button.pack(pady=10)
+
+edit_button = tk.Button(root, text="Edit Data Ikan", command=halaman_edit_data, font=("Arial", 12), width=30, bg="white", fg="black")
 edit_button.pack(pady=10)
-
-hitung_button = tk.Button(root, text="Hitung Jarak Tempuh Ikan", command=halaman_hitung_jarak, font=("Arial", 12), width=20, bg="white", fg="black")
-hitung_button.pack(pady=10)
-
-# Tombol Keluar
-keluar_button = tk.Button(root, text="Keluar", command=keluar_aplikasi, font=("Arial", 12), width=20, bg="red", fg="white")
-keluar_button.pack(pady=20)
 
 root.mainloop()
