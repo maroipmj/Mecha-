@@ -53,22 +53,22 @@ def halaman_tampilkan_data_ikan():
         if pilihan.get() == "Nama Ikan":
             data = baca_file('nama_ikan.txt')
             for i, item in enumerate(data):
-                ikan_listbox.insert(tk.END, f"ID: {i + 1} | Nama: {item[0]}")
+                ikan_listbox.insert(tk.END, f"Nama: {item[0]}")
             tulis_history("Menampilkan data Nama Ikan")
         elif pilihan.get() == "Jenis Ikan":
             data = baca_file('nama_jenis.txt')
             for i, item in enumerate(data):
-                ikan_listbox.insert(tk.END, f"ID: {i + 1} | Jenis: {item[0]}")
+                ikan_listbox.insert(tk.END, f"Jenis: {item[0]}")
             tulis_history("Menampilkan data Jenis Ikan")
         elif pilihan.get() == "Warna Ikan":
             data = baca_file('nama_warna.txt')
             for i, item in enumerate(data):
-                ikan_listbox.insert(tk.END, f"ID: {i + 1} | Warna: {item[0]}")
+                ikan_listbox.insert(tk.END, f"Warna: {item[0]}")
             tulis_history("Menampilkan data Warna Ikan")
         elif pilihan.get() == "Jarak Tempuh":
             data = baca_file('jarak_tempuh.txt')
             for i, item in enumerate(data):
-                ikan_listbox.insert(tk.END, f"ID: {i + 1} | Waktu: {item[0]} jam, Jarak: {item[1]} km")
+                ikan_listbox.insert(tk.END, f"Waktu: {item[0]} jam, Jarak: {item[0]} km")
             tulis_history("Menampilkan data Jarak Tempuh")
 
     tombol_tampil = tk.Button(tampil_window, text="Tampilkan Data", command=tampil_data, bg="white", fg="black")
@@ -282,19 +282,38 @@ def halaman_hapus_data():
     dropdown_hapus['values'] = ["Nama Ikan", "Jenis Ikan", "Warna Ikan", "Jarak Tempuh"]
     dropdown_hapus.grid(row=0, column=1, padx=10, pady=5)
 
-    # Label dan Entry untuk data yang ingin dihapus (dinamis)
-    label_data_hapus = tk.Label(hapus_window, text="Data yang ingin dihapus:", bg="#003366", fg="white")
-    label_data_hapus.grid(row=1, column=0, padx=10, pady=5)
+    # Listbox untuk menampilkan data yang ada
+    data_listbox = tk.Listbox(hapus_window, width=50, height=10)
+    data_listbox.grid(row=1, columnspan=2, padx=10, pady=10)
 
-    entry_data_hapus = tk.Entry(hapus_window)
-    entry_data_hapus.grid(row=1, column=1, padx=10, pady=5)
+    def update_data_listbox():
+        # Kosongkan Listbox dan tampilkan data berdasarkan pilihan user
+        data_listbox.delete(0, tk.END)
+        data = []
+        if dropdown_hapus.get() == "Nama Ikan":
+            data = baca_file('nama_ikan.txt')
+        elif dropdown_hapus.get() == "Jenis Ikan":
+            data = baca_file('nama_jenis.txt')
+        elif dropdown_hapus.get() == "Warna Ikan":
+            data = baca_file('nama_warna.txt')
+        elif dropdown_hapus.get() == "Jarak Tempuh":
+            data = baca_file('jarak_tempuh.txt')
+
+        for item in data:
+            data_listbox.insert(tk.END, item[0])
+
+    # Update listbox saat combobox dipilih
+    dropdown_hapus.bind("<<ComboboxSelected>>", lambda e: update_data_listbox())
 
     def hapus_data():
-        data_hapus = entry_data_hapus.get()
-        if not data_hapus:
-            messagebox.showwarning("Peringatan", "Isi data yang ingin dihapus!")
+        # Ambil data yang dipilih dari Listbox
+        selected_index = data_listbox.curselection()
+        if not selected_index:
+            messagebox.showwarning("Peringatan", "Pilih data yang ingin dihapus!")
             return
-        
+
+        data_hapus = data_listbox.get(selected_index)
+
         if dropdown_hapus.get() == "Nama Ikan":
             data = baca_file('nama_ikan.txt')
             updated_data = [item for item in data if item[0] != data_hapus]
@@ -316,8 +335,9 @@ def halaman_hapus_data():
             tulis_file('jarak_tempuh.txt', updated_data)
             tulis_history(f"Menghapus Jarak Tempuh: {data_hapus}")
 
+        # Update Listbox setelah penghapusan
         messagebox.showinfo("Sukses", "Data berhasil dihapus!")
-        entry_data_hapus.delete(0, tk.END)
+        update_data_listbox()
 
     hapus_button = tk.Button(hapus_window, text="Hapus Data Ikan", command=hapus_data, bg="white", fg="black")
     hapus_button.grid(row=4, columnspan=2, pady=10)
