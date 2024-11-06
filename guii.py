@@ -20,6 +20,10 @@ def tampilkan_header(window, title):
     header_label = tk.Label(window, text=title, font=("Arial", 16), bg="#003366", fg="white")
     header_label.pack(pady=10)
 
+# Fungsi untuk keluar dari window
+def keluar(window):
+    window.destroy()
+
 # Halaman untuk menampilkan data ikan
 def halaman_tampilkan_data_ikan():
     tampil_window = tk.Toplevel(root)
@@ -41,23 +45,27 @@ def halaman_tampilkan_data_ikan():
         ikan_listbox.delete(0, tk.END)
         if pilihan.get() == "Nama Ikan":
             data = baca_file('nama_ikan.txt')
-            for i, item in enumerate(data):
-                ikan_listbox.insert(tk.END, f"ID: {i + 1} | Nama: {item[0]}")
+            for item in data:
+                ikan_listbox.insert(tk.END, f"Nama: {item[0]}")
         elif pilihan.get() == "Jenis Ikan":
             data = baca_file('nama_jenis.txt')
-            for i, item in enumerate(data):
-                ikan_listbox.insert(tk.END, f"ID: {i + 1} | Jenis: {item[0]}")
+            for item in data:
+                ikan_listbox.insert(tk.END, f"Jenis: {item[0]}")
         elif pilihan.get() == "Warna Ikan":
             data = baca_file('nama_warna.txt')
-            for i, item in enumerate(data):
-                ikan_listbox.insert(tk.END, f"ID: {i + 1} | Warna: {item[0]}")
+            for item in data:
+                ikan_listbox.insert(tk.END, f"Warna: {item[0]}")
         elif pilihan.get() == "Jarak Tempuh":
             data = baca_file('jarak_tempuh.txt')
-            for i, item in enumerate(data):
-                ikan_listbox.insert(tk.END, f"ID: {i + 1} | Kecepatan: {item[0]} km/jam, Waktu: {item[1]} jam, Jarak: {item[2]} km")
+            for item in data:
+                ikan_listbox.insert(tk.END, f"Waktu: {item[0]} jam, Jarak: {item[1]} km")
 
     tombol_tampil = tk.Button(tampil_window, text="Tampilkan Data", command=tampil_data, bg="white", fg="black")
     tombol_tampil.pack(pady=10)
+
+    # Tombol keluar
+    tombol_keluar = tk.Button(tampil_window, text="Keluar", command=lambda: keluar(tampil_window), bg="red", fg="white")
+    tombol_keluar.pack(pady=10)
 
 # Halaman untuk edit data ikan
 def halaman_edit_data():
@@ -67,7 +75,7 @@ def halaman_edit_data():
 
     label_edit = tk.Label(edit_window, text="Pilih Data Ikan yang ingin diedit:", bg="#003366", fg="white")
     label_edit.grid(row=0, column=0, padx=10, pady=5)
-    
+
     dropdown_edit = ttk.Combobox(edit_window)
     dropdown_edit['values'] = ["Nama Ikan", "Jenis Ikan", "Warna Ikan", "Jarak Tempuh"]
     dropdown_edit.grid(row=0, column=1, padx=10, pady=5)
@@ -78,7 +86,7 @@ def halaman_edit_data():
     pilihan_item = ttk.Combobox(edit_window)
     pilihan_item.grid(row=1, column=1, padx=10, pady=5)
 
-    def update_item_list(event):
+    def update_edit_item_list(event):
         if dropdown_edit.get() == "Nama Ikan":
             pilihan_item['values'] = [item[0] for item in baca_file('nama_ikan.txt')]
         elif dropdown_edit.get() == "Jenis Ikan":
@@ -86,9 +94,9 @@ def halaman_edit_data():
         elif dropdown_edit.get() == "Warna Ikan":
             pilihan_item['values'] = [item[0] for item in baca_file('nama_warna.txt')]
         elif dropdown_edit.get() == "Jarak Tempuh":
-            pilihan_item['values'] = [f"Kecepatan: {item[0]}, Waktu: {item[1]}, Jarak: {item[2]}" for item in baca_file('jarak_tempuh.txt')]
+            pilihan_item['values'] = [f"Waktu: {item[0]}, Jarak: {item[1]}" for item in baca_file('jarak_tempuh.txt')]
 
-    dropdown_edit.bind("<<ComboboxSelected>>", update_item_list)
+    dropdown_edit.bind("<<ComboboxSelected>>", update_edit_item_list)
 
     label_edit_value = tk.Label(edit_window, text="Data Baru:", bg="#003366", fg="white")
     label_edit_value.grid(row=2, column=0, padx=10, pady=5)
@@ -114,8 +122,8 @@ def halaman_edit_data():
                 tulis_file('nama_warna.txt', warna_ikan)
             elif dropdown_edit.get() == "Jarak Tempuh":
                 jarak_tempuh = baca_file('jarak_tempuh.txt')
-                kecepatan, waktu, jarak = data_baru.split(',')
-                jarak_tempuh[selected_item] = [kecepatan, waktu, jarak]
+                waktu, jarak = data_baru.split(',')
+                jarak_tempuh[selected_item] = [waktu.strip(), jarak.strip()]
                 tulis_file('jarak_tempuh.txt', jarak_tempuh)
 
             messagebox.showinfo("Sukses", "Data berhasil diedit!")
@@ -124,6 +132,10 @@ def halaman_edit_data():
 
     edit_button = tk.Button(edit_window, text="Edit Data Ikan", command=edit_data, bg="white", fg="black")
     edit_button.grid(row=3, columnspan=2, pady=10)
+
+    # Tombol keluar
+    tombol_keluar = tk.Button(edit_window, text="Keluar", command=lambda: keluar(edit_window), bg="red", fg="white")
+    tombol_keluar.grid(row=4, columnspan=2, pady=10)
 
 # Halaman untuk hapus data ikan
 def halaman_hapus_data():
@@ -144,7 +156,7 @@ def halaman_hapus_data():
     pilihan_item = ttk.Combobox(hapus_window)
     pilihan_item.grid(row=1, column=1, padx=10, pady=5)
 
-    def update_item_list(event):
+    def update_hapus_item_list(event):
         if dropdown_hapus.get() == "Nama Ikan":
             pilihan_item['values'] = [item[0] for item in baca_file('nama_ikan.txt')]
         elif dropdown_hapus.get() == "Jenis Ikan":
@@ -152,29 +164,28 @@ def halaman_hapus_data():
         elif dropdown_hapus.get() == "Warna Ikan":
             pilihan_item['values'] = [item[0] for item in baca_file('nama_warna.txt')]
         elif dropdown_hapus.get() == "Jarak Tempuh":
-            pilihan_item['values'] = [f"Kecepatan: {item[0]}, Waktu: {item[1]}, Jarak: {item[2]}" for item in baca_file('jarak_tempuh.txt')]
+            pilihan_item['values'] = [f"Waktu: {item[0]}, Jarak: {item[1]}" for item in baca_file('jarak_tempuh.txt')]
 
-    dropdown_hapus.bind("<<ComboboxSelected>>", update_item_list)
+    dropdown_hapus.bind("<<ComboboxSelected>>", update_hapus_item_list)
 
     def hapus_data():
         selected_item = pilihan_item.current()
-
         if selected_item >= 0:
             if dropdown_hapus.get() == "Nama Ikan":
                 nama_ikan = baca_file('nama_ikan.txt')
-                del nama_ikan[selected_item]
+                nama_ikan.pop(selected_item)
                 tulis_file('nama_ikan.txt', nama_ikan)
             elif dropdown_hapus.get() == "Jenis Ikan":
                 jenis_ikan = baca_file('nama_jenis.txt')
-                del jenis_ikan[selected_item]
+                jenis_ikan.pop(selected_item)
                 tulis_file('nama_jenis.txt', jenis_ikan)
             elif dropdown_hapus.get() == "Warna Ikan":
                 warna_ikan = baca_file('nama_warna.txt')
-                del warna_ikan[selected_item]
+                warna_ikan.pop(selected_item)
                 tulis_file('nama_warna.txt', warna_ikan)
             elif dropdown_hapus.get() == "Jarak Tempuh":
                 jarak_tempuh = baca_file('jarak_tempuh.txt')
-                del jarak_tempuh[selected_item]
+                jarak_tempuh.pop(selected_item)
                 tulis_file('jarak_tempuh.txt', jarak_tempuh)
 
             messagebox.showinfo("Sukses", "Data berhasil dihapus!")
@@ -184,19 +195,32 @@ def halaman_hapus_data():
     hapus_button = tk.Button(hapus_window, text="Hapus Data Ikan", command=hapus_data, bg="white", fg="black")
     hapus_button.grid(row=2, columnspan=2, pady=10)
 
-# Menginisialisasi aplikasi
+    # Tombol keluar
+    tombol_keluar = tk.Button(hapus_window, text="Keluar", command=lambda: keluar(hapus_window), bg="red", fg="white")
+    tombol_keluar.grid(row=3, columnspan=2, pady=10)
+
+# Setup Tkinter Root
 root = tk.Tk()
 root.title("Aplikasi Data Ikan")
+root.geometry("400x400")
 root.configure(bg="#003366")
 
-# Tombol untuk membuka halaman masing-masing
-tombol_tampil = tk.Button(root, text="Tampilkan Data Ikan", command=halaman_tampilkan_data_ikan, bg="white", fg="black")
-tombol_tampil.pack(pady=10)
+# Label utama
+label_utama = tk.Label(root, text="Selamat Datang di Aplikasi Data Ikan", font=("Arial", 16), bg="#003366", fg="white")
+label_utama.pack(pady=20)
 
-tombol_edit = tk.Button(root, text="Edit Data Ikan", command=halaman_edit_data, bg="white", fg="black")
-tombol_edit.pack(pady=10)
+# Tombol
+tombol_tampilkan_data = tk.Button(root, text="Tampilkan Data Ikan", command=halaman_tampilkan_data_ikan, bg="white", fg="black")
+tombol_tampilkan_data.pack(pady=5)
 
-tombol_hapus = tk.Button(root, text="Hapus Data Ikan", command=halaman_hapus_data, bg="white", fg="black")
-tombol_hapus.pack(pady=10)
+tombol_edit_data = tk.Button(root, text="Edit Data Ikan", command=halaman_edit_data, bg="white", fg="black")
+tombol_edit_data.pack(pady=5)
 
+tombol_hapus_data = tk.Button(root, text="Hapus Data Ikan", command=halaman_hapus_data, bg="white", fg="black")
+tombol_hapus_data.pack(pady=5)
+
+tombol_keluar = tk.Button(root, text="Keluar", command=root.quit, bg="red", fg="white")
+tombol_keluar.pack(pady=5)
+
+# Menjalankan aplikasi
 root.mainloop()
