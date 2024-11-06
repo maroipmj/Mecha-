@@ -1,115 +1,182 @@
 import tkinter as tk
 from tkinter import messagebox
 
-class IkanApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Data Ikan")
+# Fungsi untuk memuat data jenis ikan dari file txt
+def load_data(filename):
+    data = []
+    try:
+        with open(filename, "r") as file:
+            for line in file:
+                item = line.strip()
+                if item:
+                    data.append(item)
+    except FileNotFoundError:
+        messagebox.showerror("Error", f"File '{filename}' tidak ditemukan.")
+    return data
 
-        self.jenis_ikan = ["Koi", "Lele"]  # Daftar jenis ikan awal
+# Fungsi untuk menyimpan data ke file txt
+def save_data(filename, data):
+    with open(filename, "w") as file:
+        for item in data:
+            file.write(item + "\n")
+
+# Load data jenis dari file eksternal
+data_jenis_ikan = load_data("jenis_ikan.txt")
+
+# Fungsi untuk menampilkan jendela tambah jenis baru
+def tambah_jenis():
+    def simpan_jenis():
+        jenis = entry_jenis.get()
+        if jenis:
+            data_jenis_ikan.append(jenis)
+            save_data("jenis_ikan.txt", data_jenis_ikan)
+            messagebox.showinfo("Berhasil", "Jenis ikan berhasil ditambahkan!")
+            update_list_jenis()
+            tambah_jendela.destroy()
+            root.attributes('-disabled', False)
+        else:
+            messagebox.showwarning("Peringatan", "Kolom jenis ikan harus diisi.")
+
+    root.attributes('-disabled', True)
+    tambah_jendela = tk.Toplevel(root)
+    tambah_jendela.title("Tambah Jenis Ikan")
+    tambah_jendela.geometry("300x150")
+
+    tk.Label(tambah_jendela, text="Jenis Ikan").pack(pady=5)
+    entry_jenis = tk.Entry(tambah_jendela)
+    entry_jenis.pack(pady=5)
+
+    tk.Button(tambah_jendela, text="Tambah Jenis", command=simpan_jenis).pack(pady=10)
+
+# Fungsi untuk menampilkan detail jenis ikan
+def detail_jenis():
+    selected_index = listbox_jenis.curselection()
+    if selected_index:
+        index = selected_index[0]
+        jenis_ikan = data_jenis_ikan[index]
+
+        root.attributes('-disabled', True)
+        detail_jendela = tk.Toplevel(root)
+        detail_jendela.title("Detail Jenis Ikan")
+        detail_jendela.geometry("300x150")
+
+        tk.Label(detail_jendela, text=f"Jenis Ikan: {jenis_ikan}").pack(pady=20)
+
+        # Fungsi untuk kembali ke jendela utama (menu jenis)
+        def kembali():
+            detail_jendela.destroy()
+            root.attributes('-disabled', False)
+
+        # Tombol Kembali untuk menutup jendela detail
+        tk.Button(detail_jendela, text="Kembali", command=kembali).pack(pady=10)
+
+        # Menangani event jika user menutup jendela detail dengan tombol "X"
+        detail_jendela.protocol("WM_DELETE_WINDOW", kembali)
+    else:
+        messagebox.showwarning("Peringatan", "Pilih jenis ikan terlebih dahulu.")
+
+# Fungsi untuk mengedit data jenis ikan
+def edit_jenis():
+    selected_index = listbox_jenis.curselection()
+    if selected_index:
+        index = selected_index[0]
+
+        def simpan_perubahan():
+            jenis = entry_jenis.get()
+            if jenis:
+                data_jenis_ikan[index] = jenis
+                save_data("jenis_ikan.txt", data_jenis_ikan)
+                messagebox.showinfo("Berhasil", "Jenis ikan berhasil diperbarui!")
+                update_list_jenis()
+                edit_jendela.destroy()
+                root.attributes('-disabled', False)
+            else:
+                messagebox.showwarning("Peringatan", "Kolom jenis ikan harus diisi.")
+
+        # Fungsi untuk kembali ke jendela utama (menu jenis)
+        def kembali():
+            edit_jendela.destroy()
+            root.attributes('-disabled', False)
+
+        root.attributes('-disabled', True)
+        edit_jendela = tk.Toplevel(root)
+        edit_jendela.title("Edit Jenis Ikan")
+        edit_jendela.geometry("300x150")
+
+        tk.Label(edit_jendela, text="Jenis Ikan").pack(pady=5)
+        entry_jenis = tk.Entry(edit_jendela)
+        entry_jenis.pack(pady=5)
+        entry_jenis.insert(0, data_jenis_ikan[index])
+
+        tk.Button(edit_jendela, text="Simpan Perubahan", command=simpan_perubahan).pack(pady=10)
+        tk.Button(edit_jendela, text="Kembali", command=kembali).pack(pady=5)
+
+        # Menangani event jika user menutup jendela edit dengan tombol "X"
+        edit_jendela.protocol("WM_DELETE_WINDOW", kembali)
+    else:
+        messagebox.showwarning("Peringatan", "Pilih jenis ikan yang ingin diedit.")
+
+# Fungsi untuk menghapus jenis ikan yang dipilih
+def hapus_jenis():
+    selected_index = listbox_jenis.curselection()
+    if selected_index:
+        index = selected_index[0]
         
-        # Frame utama
-        self.frame_main = tk.Frame(self.root)
-        self.frame_main.pack()
+        konfirmasi = messagebox.askyesno("Konfirmasi", f"Apakah Anda yakin ingin menghapus jenis ikan '{data_jenis_ikan[index]}'?")
+        if konfirmasi:
+            data_jenis_ikan.pop(index)
+            save_data("jenis_ikan.txt", data_jenis_ikan)
+            
+            update_list_jenis()
+            messagebox.showinfo("Berhasil", "Jenis ikan berhasil dihapus.")
+    else:
+        messagebox.showwarning("Peringatan", "Pilih jenis ikan yang ingin dihapus.")
 
-        # Tombol Jenis
-        self.btn_jenis = tk.Button(self.frame_main, text="Jenis", command=self.menu_jenis)
-        self.btn_jenis.pack(pady=10)
-        
-    def menu_jenis(self):
-        self.frame_main.pack_forget()
-        self.frame_jenis = tk.Frame(self.root)
-        self.frame_jenis.pack()
+# Fungsi untuk memperbarui daftar jenis ikan di listbox
+def update_list_jenis():
+    listbox_jenis.delete(0, tk.END)
+    for i, jenis in enumerate(data_jenis_ikan, start=1):
+        listbox_jenis.insert(tk.END, f"{i}: {jenis}")
 
-        # Daftar jenis ikan
-        self.listbox_jenis = tk.Listbox(self.frame_jenis)
-        self.update_jenis_listbox()
-        self.listbox_jenis.pack()
+# Fungsi untuk kembali ke menu utama
+def kembali_ke_menu():
+    root.destroy()
 
-        # Tombol Tambah, Hapus, dan Edit
-        btn_tambah = tk.Button(self.frame_jenis, text="+", command=self.tambah_jenis)
-        btn_tambah.pack(side=tk.LEFT, padx=5)
-        
-        btn_hapus = tk.Button(self.frame_jenis, text="-", command=self.hapus_jenis)
-        btn_hapus.pack(side=tk.LEFT, padx=5)
+# Membuat jendela utama
+root = tk.Tk()
+root.title("Data Jenis Ikan")
+root.geometry("400x400")
 
-        btn_edit = tk.Button(self.frame_jenis, text="Edit", command=self.edit_jenis)
-        btn_edit.pack(side=tk.LEFT, padx=5)
+# Label judul
+label_judul = tk.Label(root, text="Data Jenis Ikan", font=("Arial", 16, "bold"))
+label_judul.pack(pady=10)
 
-        # Tombol kembali
-        btn_kembali = tk.Button(self.frame_jenis, text="Kembali", command=self.kembali_menu_utama)
-        btn_kembali.pack(pady=10)
-        
-    def update_jenis_listbox(self):
-        self.listbox_jenis.delete(0, tk.END)
-        for idx, jenis in enumerate(self.jenis_ikan, start=1):
-            self.listbox_jenis.insert(tk.END, f"{idx}: {jenis}")
-    
-    def tambah_jenis(self):
-        self.frame_jenis.pack_forget()
-        self.frame_tambah = tk.Frame(self.root)
-        self.frame_tambah.pack()
+# List Jenis Ikan
+frame_list = tk.Frame(root)
+frame_list.pack()
 
-        self.entry_tambah = tk.Entry(self.frame_tambah)
-        self.entry_tambah.pack()
+listbox_jenis = tk.Listbox(frame_list, width=30, height=10)
+listbox_jenis.pack(side="left")
 
-        btn_tambah = tk.Button(self.frame_tambah, text="Tambah", command=self.simpan_tambah_jenis)
-        btn_tambah.pack(pady=5)
+scrollbar = tk.Scrollbar(frame_list)
+scrollbar.pack(side="right", fill="y")
+listbox_jenis.config(yscrollcommand=scrollbar.set)
+scrollbar.config(command=listbox_jenis.yview)
 
-        btn_kembali = tk.Button(self.frame_tambah, text="Kembali", command=self.kembali_menu_jenis)
-        btn_kembali.pack(pady=5)
+# Tombol Tambah, Hapus, Detail, Edit
+frame_buttons = tk.Frame(root)
+frame_buttons.pack(pady=10)
 
-    def simpan_tambah_jenis(self):
-        jenis_baru = self.entry_tambah.get()
-        if jenis_baru:
-            self.jenis_ikan.append(jenis_baru)
-            self.kembali_menu_jenis()
+tk.Button(frame_buttons, text="+", command=tambah_jenis).grid(row=0, column=0, padx=5)
+tk.Button(frame_buttons, text="-", command=hapus_jenis).grid(row=0, column=3, padx=5)
+tk.Button(frame_buttons, text="Detail", command=detail_jenis).grid(row=3, column=1, padx=5)
+tk.Button(frame_buttons, text="Edit", command=edit_jenis).grid(row=0, column=1, padx=5)
 
-    def hapus_jenis(self):
-        selected = self.listbox_jenis.curselection()
-        if selected:
-            jenis = self.jenis_ikan[selected[0]]
-            confirm = messagebox.askyesno("Konfirmasi", f"Apakah Anda yakin ingin menghapus {jenis}?")
-            if confirm:
-                self.jenis_ikan.pop(selected[0])
-                self.update_jenis_listbox()
-    
-    def edit_jenis(self):
-        selected = self.listbox_jenis.curselection()
-        if selected:
-            self.jenis_index = selected[0]
-            self.jenis_edit = self.jenis_ikan[self.jenis_index]
-            self.frame_jenis.pack_forget()
-            self.frame_edit = tk.Frame(self.root)
-            self.frame_edit.pack()
+# Tombol kembali
+tk.Button(root, text="Kembali", command=kembali_ke_menu).pack(pady=8)
 
-            self.entry_edit = tk.Entry(self.frame_edit)
-            self.entry_edit.insert(0, self.jenis_edit)
-            self.entry_edit.pack()
+# Load daftar jenis ikan ke listbox
+update_list_jenis()
 
-            btn_simpan = tk.Button(self.frame_edit, text="Simpan", command=self.simpan_edit_jenis)
-            btn_simpan.pack(pady=5)
-
-            btn_kembali = tk.Button(self.frame_edit, text="Kembali", command=self.kembali_menu_jenis)
-            btn_kembali.pack(pady=5)
-
-    def simpan_edit_jenis(self):
-        jenis_baru = self.entry_edit.get()
-        if jenis_baru:
-            self.jenis_ikan[self.jenis_index] = jenis_baru
-            self.kembali_menu_jenis()
-
-    def kembali_menu_utama(self):
-        self.frame_jenis.pack_forget()
-        self.frame_main.pack()
-
-    def kembali_menu_jenis(self):
-        self.frame_tambah.pack_forget() if hasattr(self, 'frame_tambah') else None
-        self.frame_edit.pack_forget() if hasattr(self, 'frame_edit') else None
-        self.frame_jenis.pack()
-        self.update_jenis_listbox()
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = IkanApp(root)
-    root.mainloop()
+# Menjalankan aplikasi
+root.mainloop()
