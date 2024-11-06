@@ -189,7 +189,7 @@ def kembali_ke_menu():
 # Membuat jendela utama
 root = tk.Tk()
 root.title("Data Ikan")
-root.geometry("400x300")
+root.geometry("400x400")
 
 # Label judul
 label_judul = tk.Label(root, text="Data Ikan", font=("Arial", 16, "bold"))
@@ -217,7 +217,7 @@ tk.Button(frame_buttons, text="Detail", command=detail_ikan).grid(row=3, column=
 tk.Button(frame_buttons, text="Edit", command=edit_ikan).grid(row=0, column=1, padx=5)
 
 # Tombol kembali
-tk.Button(root, text="Kembali", command=kembali_ke_menu).pack(pady=10)
+tk.Button(root, text="Kembali", command=kembali_ke_menu).pack(pady=8)
 
 # Load daftar ikan ke listbox
 update_list_ikan()
