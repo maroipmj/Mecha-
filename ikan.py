@@ -9,7 +9,7 @@ def load_data(filename):
         with open(filename, "r") as file:
             for line in file:
                 item = line.strip()
-                if item:  # Menambahkan item jika tidak kosong
+                if item:
                     data.append(item)
     except FileNotFoundError:
         messagebox.showerror("Error", f"File '{filename}' tidak ditemukan.")
@@ -22,9 +22,9 @@ def save_data(filename, data):
             file.write(item + "\n")
 
 # Load data dari file eksternal
-data_nama_ikan = load_data("nama_ikan.txt")  # Memuat nama ikan
-data_jenis_ikan = load_data("nama_jenis.txt")  # Memuat jenis ikan
-data_warna_ikan = load_data("nama_warna.txt")  # Memuat warna ikan
+data_nama_ikan = load_data("nama_ikan.txt")
+data_jenis_ikan = load_data("nama_jenis.txt")
+data_warna_ikan = load_data("nama_warna.txt")
 
 # Fungsi untuk menampilkan jendela tambah ikan baru
 def tambah_ikan():
@@ -55,18 +55,15 @@ def tambah_ikan():
     entry_nama = tk.Entry(tambah_jendela)
     entry_nama.pack()
 
-    tk.Label(tambah_jendela, text="Jenis Ikan:").pack()
+    tk.Label(tambah_jendela, text="Jenis Ikan").pack()
     entry_jenis = tk.Entry(tambah_jendela)
     entry_jenis.pack()
 
-    tk.Label(tambah_jendela, text="Warna Ikan:").pack()
+    tk.Label(tambah_jendela, text="Warna Ikan").pack()
     entry_warna = tk.Entry(tambah_jendela)
     entry_warna.pack()
 
     tk.Button(tambah_jendela, text="Tambah Ikan", command=simpan_ikan).pack(pady=10)
-
-    def kembali():
-        root.attributes('-disabled', False)
 
 # Fungsi untuk menampilkan detail ikan
 def detail_ikan():
@@ -86,13 +83,75 @@ def detail_ikan():
         tk.Label(detail_jendela, text=f"Jenis : {jenis_ikan}").pack()
         tk.Label(detail_jendela, text=f"Warna : {warna_ikan}").pack()
 
+        # Fungsi untuk kembali ke jendela utama (menu ikan)
         def kembali():
             detail_jendela.destroy()
             root.attributes('-disabled', False)
 
+        # Tombol Kembali untuk menutup jendela detail
+        tk.Button(detail_jendela, text="Kembali", command=kembali).pack(pady=10)
+
+        # Menangani event jika user menutup jendela detail dengan tombol "X"
         detail_jendela.protocol("WM_DELETE_WINDOW", kembali)
     else:
         messagebox.showwarning("Peringatan", "Pilih ikan terlebih dahulu.")
+
+# Fungsi untuk mengedit data ikan
+def edit_ikan():
+    selected_index = listbox_ikan.curselection()
+    if selected_index:
+        index = selected_index[0]
+
+        def simpan_perubahan():
+            nama = entry_nama.get()
+            jenis = entry_jenis.get()
+            warna = entry_warna.get()
+            if nama and jenis and warna:
+                data_nama_ikan[index] = nama
+                data_jenis_ikan[index] = jenis
+                data_warna_ikan[index] = warna
+                save_data("nama_ikan.txt", data_nama_ikan)
+                save_data("nama_jenis.txt", data_jenis_ikan)
+                save_data("nama_warna.txt", data_warna_ikan)
+                messagebox.showinfo("Berhasil", "Data ikan berhasil diperbarui!")
+                update_list_ikan()
+                edit_jendela.destroy()
+                root.attributes('-disabled', False)
+            else:
+                messagebox.showwarning("Peringatan", "Semua kolom harus diisi.")
+
+        # Fungsi untuk kembali ke jendela utama (menu ikan)
+        def kembali():
+            edit_jendela.destroy()
+            root.attributes('-disabled', False)
+
+        root.attributes('-disabled', True)
+        edit_jendela = tk.Toplevel(root)
+        edit_jendela.title("Edit Ikan")
+        edit_jendela.geometry("300x200")
+
+        tk.Label(edit_jendela, text="Nama Ikan").pack()
+        entry_nama = tk.Entry(edit_jendela)
+        entry_nama.pack()
+        entry_nama.insert(0, data_nama_ikan[index])
+
+        tk.Label(edit_jendela, text="Jenis Ikan").pack()
+        entry_jenis = tk.Entry(edit_jendela)
+        entry_jenis.pack()
+        entry_jenis.insert(0, data_jenis_ikan[index] if index < len(data_jenis_ikan) else "")
+
+        tk.Label(edit_jendela, text="Warna Ikan").pack()
+        entry_warna = tk.Entry(edit_jendela)
+        entry_warna.pack()
+        entry_warna.insert(0, data_warna_ikan[index] if index < len(data_warna_ikan) else "")
+
+        tk.Button(edit_jendela, text="Simpan Perubahan", command=simpan_perubahan).pack(pady=10)
+        tk.Button(edit_jendela, text="Kembali", command=kembali).pack(pady=5)
+
+        # Menangani event jika user menutup jendela edit dengan tombol "X"
+        edit_jendela.protocol("WM_DELETE_WINDOW", kembali)
+    else:
+        messagebox.showwarning("Peringatan", "Pilih ikan yang ingin diedit.")
 
 # Fungsi untuk menghapus ikan yang dipilih
 def hapus_ikan():
@@ -100,22 +159,18 @@ def hapus_ikan():
     if selected_index:
         index = selected_index[0]
         
-        # Konfirmasi penghapusan
         konfirmasi = messagebox.askyesno("Konfirmasi", f"Apakah Anda yakin ingin menghapus ikan '{data_nama_ikan[index]}'?")
         if konfirmasi:
-            # Hapus data ikan dari ketiga list
             data_nama_ikan.pop(index)
             if index < len(data_jenis_ikan):
                 data_jenis_ikan.pop(index)
             if index < len(data_warna_ikan):
                 data_warna_ikan.pop(index)
             
-            # Simpan perubahan ke file
             save_data("nama_ikan.txt", data_nama_ikan)
             save_data("nama_jenis.txt", data_jenis_ikan)
             save_data("nama_warna.txt", data_warna_ikan)
             
-            # Update tampilan list ikan
             update_list_ikan()
             messagebox.showinfo("Berhasil", "Ikan berhasil dihapus.")
     else:
@@ -152,13 +207,14 @@ scrollbar.pack(side="right", fill="y")
 listbox_ikan.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=listbox_ikan.yview)
 
-# Tombol Hapus, Detail, Tambah
+# Tombol Tambah, Hapus, Detail, Edit
 frame_buttons = tk.Frame(root)
 frame_buttons.pack(pady=10)
 
-tk.Button(frame_buttons, text="–", command=hapus_ikan).grid(row=0, column=0, padx=5)
-tk.Button(frame_buttons, text="Detail", command=detail_ikan).grid(row=0, column=1, padx=5)
-tk.Button(frame_buttons, text="+", command=tambah_ikan).grid(row=0, column=2, padx=5)
+tk.Button(frame_buttons, text="+", command=tambah_ikan).grid(row=0, column=0, padx=5)
+tk.Button(frame_buttons, text="-", command=hapus_ikan).grid(row=0, column=3, padx=5)
+tk.Button(frame_buttons, text="Detail", command=detail_ikan).grid(row=3, column=1, padx=5)
+tk.Button(frame_buttons, text="Edit", command=edit_ikan).grid(row=0, column=1, padx=5)
 
 # Tombol kembali
 tk.Button(root, text="Kembali", command=kembali_ke_menu).pack(pady=10)
