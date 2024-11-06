@@ -346,26 +346,8 @@ def halaman_hapus_data():
     tombol_keluar = tk.Button(hapus_window, text="Keluar", command=lambda: keluar(hapus_window), bg="red", fg="white")
     tombol_keluar.grid(row=5, columnspan=2, pady=10)
 
-# Halaman untuk menampilkan history call
-def halaman_history_call():
-    history_window = tk.Toplevel(root)
-    history_window.title("History Call")
-    history_window.configure(bg="#003366")
-    tampilkan_header(history_window, "History Call")
-
-    history_listbox = tk.Listbox(history_window, width=50, height=20)
-    history_listbox.pack(pady=20)
-
-    # Membaca file history.txt dan menampilkannya di listbox
-    try:
-        with open('history.txt', 'r') as f:
-            for line in f:
-                history_listbox.insert(tk.END, line.strip())
-    except FileNotFoundError:
-        history_listbox.insert(tk.END, "Belum ada history.")
-
     # Tombol keluar
-    tombol_keluar = tk.Button(history_window, text="Keluar", command=lambda: keluar(history_window), bg="red", fg="white")
+    tombol_keluar = tk.Button( text="Keluar", command=lambda: keluar, bg="red", fg="white")
     tombol_keluar.pack(pady=10)
 
 # Setup main window
@@ -393,10 +375,6 @@ edit_button.pack(pady=10)
 # Tombol untuk menghapus data ikan
 hapus_button = tk.Button(root, text="Hapus Data Ikan", command=halaman_hapus_data, bg="white", fg="black")
 hapus_button.pack(pady=10)
-
-# Tombol untuk melihat history call
-history_button = tk.Button(root, text="Lihat History Call", command=halaman_history_call, bg="white", fg="black")
-history_button.pack(pady=10)
 
 # Tombol untuk keluar aplikasi
 keluar_button = tk.Button(root, text="Keluar", command=root.quit, bg="red", fg="white")
