@@ -38,7 +38,7 @@ btn_jenis.grid(row=1, column=0, padx=5, pady=5)
 btn_warna = tk.Button(frame_menu, text="Warna", command=lambda: buka_file_py("warna.py"), width=20)
 btn_warna.grid(row=2, column=0, padx=5, pady=5)
 
-btn_transaksi = tk.Button(frame_menu, text="Transaksi", command=lambda: buka_file_py("transaksi.py"), width=20)
+btn_transaksi = tk.Button(frame_menu, text="Transaksi", command=lambda: buka_file_py("jarak.py"), width=20)
 btn_transaksi.grid(row=3, column=0, padx=5, pady=5)
 
 # Membuat tombol Keluar dengan background merah
