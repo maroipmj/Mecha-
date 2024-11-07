@@ -3,7 +3,7 @@ from tkinter import messagebox
 from tkinter import ttk
 import os
 
-# Nama file untuk menyimpan data jenis ikan dan jarak tempuh
+# Nama file untuk menyimpan data jenis ikan, transaksi, dan jarak tempuh + waktu
 FILE_JENIS_IKAN = "nama_jenis.txt"
 FILE_TRANSAKSI = "transaksi.txt"
 FILE_JARAK_TEMPUH = "jarak_tempuh.txt"
@@ -38,33 +38,39 @@ ensure_file_exists(FILE_JENIS_IKAN)
 ensure_file_exists(FILE_TRANSAKSI)
 ensure_file_exists(FILE_JARAK_TEMPUH)
 
-# Load data jenis ikan, transaksi, dan jarak tempuh
+# Load data jenis ikan, transaksi, dan jarak tempuh + waktu
 data_jenis_ikan = load_data(FILE_JENIS_IKAN)
 data_transaksi = load_data(FILE_TRANSAKSI)
-data_jarak_tempuh = load_data(FILE_JARAK_TEMPUH)
+data_jarak_waktu = load_data(FILE_JARAK_TEMPUH)
 
 # Fungsi untuk memperbarui daftar transaksi di listbox
 def update_list_transaksi():
     listbox_transaksi.delete(0, tk.END)
-    for transaksi, jarak in zip(data_transaksi, data_jarak_tempuh):
-        listbox_transaksi.insert(tk.END, f"{transaksi} - {jarak} km")
+    for transaksi, jarak_waktu in zip(data_transaksi, data_jarak_waktu):
+        jarak, waktu = map(float, jarak_waktu.split(","))
+        try:
+            kecepatan = round(jarak / waktu, 2)
+        except ZeroDivisionError:
+            kecepatan = 0
+        listbox_transaksi.insert(tk.END, f"{transaksi} - {jarak} km - {waktu} jam - {kecepatan} km/jam")
 
 # Fungsi untuk menampilkan jendela tambah transaksi
 def tambah_transaksi():
     def simpan_transaksi():
         ikan = combo_ikan.get()
         jarak = entry_jarak.get()
+        waktu = entry_waktu.get()
 
-        if not ikan or not jarak:
+        if not ikan or not jarak or not waktu:
             messagebox.showwarning("Peringatan", "Semua kolom harus diisi.")
             return
 
         transaksi = f"{ikan}"
         data_transaksi.append(transaksi)
-        data_jarak_tempuh.append(jarak)
+        data_jarak_waktu.append(f"{jarak},{waktu}")
 
         save_data(FILE_TRANSAKSI, data_transaksi)
-        save_data(FILE_JARAK_TEMPUH, data_jarak_tempuh)
+        save_data(FILE_JARAK_TEMPUH, data_jarak_waktu)
 
         messagebox.showinfo("Berhasil", "Transaksi berhasil ditambahkan!")
         update_list_transaksi()
@@ -74,7 +80,7 @@ def tambah_transaksi():
     root.attributes('-disabled', True)
     tambah_jendela = tk.Toplevel(root)
     tambah_jendela.title("Tambah Transaksi")
-    tambah_jendela.geometry("300x250")
+    tambah_jendela.geometry("300x300")
     
     # Label Judul
     tk.Label(tambah_jendela, text="Tambah Transaksi", font=("Arial", 14, "bold")).pack(pady=10)
@@ -85,22 +91,27 @@ def tambah_transaksi():
     combo_ikan.pack(pady=5)
     
     # Input jarak
-    tk.Label(tambah_jendela, text="Jarak").pack(pady=5)
+    tk.Label(tambah_jendela, text="Jarak (km)").pack(pady=5)
     entry_jarak = tk.Entry(tambah_jendela)
     entry_jarak.pack(pady=5)
+
+    # Input waktu
+    tk.Label(tambah_jendela, text="Waktu (jam)").pack(pady=5)
+    entry_waktu = tk.Entry(tambah_jendela)
+    entry_waktu.pack(pady=5)
 
     # Tombol Simpan dan Kembali
     tk.Button(tambah_jendela, text="Simpan", command=simpan_transaksi).pack(pady=5)
     tk.Button(tambah_jendela, text="Kembali", command=lambda: tambah_jendela.destroy()).pack()
 
 # Fungsi untuk kembali ke menu utama
-def kembali_ke_menu():
+def kembali():
     root.destroy()
 
 # Membuat jendela utama
 root = tk.Tk()
 root.title("Data Transaksi Ikan")
-root.geometry("500x400")
+root.geometry("600x400")
 
 # Label judul
 label_judul = tk.Label(root, text="Transaksi Ikan", font=("Arial", 16, "bold"))
@@ -110,10 +121,10 @@ label_judul.pack(pady=10)
 frame_list = tk.Frame(root, borderwidth=1, relief="solid")
 frame_list.pack(pady=10, padx=10)
 
-tk.Label(frame_list, text="Ikan       Jarak", font=("Arial", 10, "bold")).pack()
+tk.Label(frame_list, text="Ikan       Jarak    Waktu    Kecepatan", font=("Arial", 10, "bold")).pack()
 
 # List Transaksi
-listbox_transaksi = tk.Listbox(frame_list, width=40, height=10)
+listbox_transaksi = tk.Listbox(frame_list, width=60, height=10)
 listbox_transaksi.pack(side="left", padx=5)
 
 scrollbar = tk.Scrollbar(frame_list)
@@ -124,8 +135,8 @@ scrollbar.config(command=listbox_transaksi.yview)
 # Tombol Tambah Transaksi
 tk.Button(root, text="Tambah Transaksi", command=tambah_transaksi).pack(pady=10)
 
-# Tombol Kembali ke Menu
-tk.Button(root, text="Kembali ke Menu", command=kembali).pack(pady=10)
+# Tombol Kembali
+tk.Button(root, text="Kembali", command=kembali).pack(pady=10)
 
 # Load daftar transaksi ke listbox
 update_list_transaksi()
