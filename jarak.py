@@ -125,7 +125,7 @@ scrollbar.config(command=listbox_transaksi.yview)
 tk.Button(root, text="Tambah Transaksi", command=tambah_transaksi).pack(pady=10)
 
 # Tombol Kembali ke Menu
-tk.Button(root, text="Kembali ke Menu", command=kembali_ke_menu).pack(pady=10)
+tk.Button(root, text="Kembali ke Menu", command=kembali).pack(pady=10)
 
 # Load daftar transaksi ke listbox
 update_list_transaksi()
