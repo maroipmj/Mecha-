@@ -1,98 +1,134 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
+import os
 
-class IkanApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Hitung Jarak Tempuh Ikan Berenang")
-        self.root.geometry("400x300")  # Tambahkan ukuran jendela utama agar konsisten
-        
-        # Label judul
-        label_judul = tk.Label(self.root, text="Hitung Jarak Tempuh Ikan", font=("Arial", 16, "bold"))
-        label_judul.pack(pady=10)
+# Nama file untuk menyimpan data jenis ikan dan jarak tempuh
+FILE_JENIS_IKAN = "nama_jenis.txt"
+FILE_TRANSAKSI = "transaksi.txt"
+FILE_JARAK_TEMPUH = "jarak_tempuh.txt"
 
-        # Frame utama
-        self.frame_main = tk.Frame(self.root)
-        self.frame_main.pack(pady=20)
+# Fungsi untuk memastikan file data ada
+def ensure_file_exists(filename):
+    if not os.path.exists(filename):
+        with open(filename, "w") as file:
+            pass  # Membuat file kosong jika belum ada
 
-        # Tombol untuk Input Kecepatan dan Waktu
-        btn_input = tk.Button(self.frame_main, text="Masukkan Data", command=self.input_data)
-        btn_input.pack(pady=10)
+# Fungsi untuk memuat data dari file txt
+def load_data(filename):
+    data = []
+    try:
+        with open(filename, "r") as file:
+            for line in file:
+                item = line.strip()
+                if item:
+                    data.append(item)
+    except FileNotFoundError:
+        messagebox.showerror("Error", f"File '{filename}' tidak ditemukan.")
+    return data
 
-    # Fungsi untuk menampilkan jendela input data
-    def input_data(self):
-        self.root.attributes('-disabled', True)  # Disable jendela utama saat popup dibuka
-        self.popup_input = tk.Toplevel(self.root)
-        self.popup_input.title("Input Data")
-        self.popup_input.geometry("300x200")
+# Fungsi untuk menyimpan data ke file txt
+def save_data(filename, data):
+    with open(filename, "w") as file:
+        for item in data:
+            file.write(item + "\n")
 
-        # Label dan Entry untuk Kecepatan
-        lbl_kecepatan = tk.Label(self.popup_input, text="Kecepatan (km/jam):")
-        lbl_kecepatan.pack(pady=5)
-        self.entry_kecepatan = tk.Entry(self.popup_input)
-        self.entry_kecepatan.pack(pady=5)
+# Pastikan file ada
+ensure_file_exists(FILE_JENIS_IKAN)
+ensure_file_exists(FILE_TRANSAKSI)
+ensure_file_exists(FILE_JARAK_TEMPUH)
 
-        # Label dan Entry untuk Waktu
-        lbl_waktu = tk.Label(self.popup_input, text="Waktu (jam):")
-        lbl_waktu.pack(pady=5)
-        self.entry_waktu = tk.Entry(self.popup_input)
-        self.entry_waktu.pack(pady=5)
+# Load data jenis ikan, transaksi, dan jarak tempuh
+data_jenis_ikan = load_data(FILE_JENIS_IKAN)
+data_transaksi = load_data(FILE_TRANSAKSI)
+data_jarak_tempuh = load_data(FILE_JARAK_TEMPUH)
 
-        # Tombol untuk Menghitung Jarak
-        btn_hitung = tk.Button(self.popup_input, text="Hitung Jarak Tempuh", command=self.hitung_jarak)
-        btn_hitung.pack(pady=10)
+# Fungsi untuk memperbarui daftar transaksi di listbox
+def update_list_transaksi():
+    listbox_transaksi.delete(0, tk.END)
+    for transaksi, jarak in zip(data_transaksi, data_jarak_tempuh):
+        listbox_transaksi.insert(tk.END, f"{transaksi} - {jarak} km")
 
-        # Tombol untuk Kembali
-        btn_kembali = tk.Button(self.popup_input, text="Kembali", command=self.kembali_menu_utama)
-        btn_kembali.pack(pady=5)
+# Fungsi untuk menampilkan jendela tambah transaksi
+def tambah_transaksi():
+    def simpan_transaksi():
+        ikan = combo_ikan.get()
+        jarak = entry_jarak.get()
 
-        # Mengatur aksi ketika tombol "X" ditekan
-        self.popup_input.protocol("WM_DELETE_WINDOW", self.kembali_menu_utama)
+        if not ikan or not jarak:
+            messagebox.showwarning("Peringatan", "Semua kolom harus diisi.")
+            return
 
-    # Fungsi untuk menghitung jarak tempuh ikan
-    def hitung_jarak(self):
-        try:
-            # Mengambil input kecepatan dan waktu
-            kecepatan = float(self.entry_kecepatan.get())
-            waktu = float(self.entry_waktu.get())
-            
-            # Menghitung jarak tempuh
-            jarak = kecepatan * waktu
-            
-            # Menampilkan hasil jarak tempuh di jendela baru
-            self.popup_input.destroy()  # Menutup jendela input setelah hitung
-            self.tampilkan_hasil(jarak)
-        except ValueError:
-            messagebox.showerror("Error", "Input tidak valid. Masukkan angka yang benar.")
+        transaksi = f"{ikan}"
+        data_transaksi.append(transaksi)
+        data_jarak_tempuh.append(jarak)
 
-    # Fungsi untuk menampilkan hasil perhitungan
-    def tampilkan_hasil(self, jarak):
-        self.popup_hasil = tk.Toplevel(self.root)
-        self.popup_hasil.title("Hasil Perhitungan")
-        self.popup_hasil.geometry("300x150")
+        save_data(FILE_TRANSAKSI, data_transaksi)
+        save_data(FILE_JARAK_TEMPUH, data_jarak_tempuh)
 
-        # Menampilkan hasil jarak tempuh
-        lbl_hasil = tk.Label(self.popup_hasil, text=f"Jarak Tempuh Ikan: {jarak} km")
-        lbl_hasil.pack(pady=20)
+        messagebox.showinfo("Berhasil", "Transaksi berhasil ditambahkan!")
+        update_list_transaksi()
+        tambah_jendela.destroy()
+        root.attributes('-disabled', False)
 
-        # Tombol untuk Kembali
-        btn_kembali = tk.Button(self.popup_hasil, text="Kembali", command=self.kembali_menu_utama_hasil)
-        btn_kembali.pack(pady=10)
+    root.attributes('-disabled', True)
+    tambah_jendela = tk.Toplevel(root)
+    tambah_jendela.title("Tambah Transaksi")
+    tambah_jendela.geometry("300x250")
+    
+    # Label Judul
+    tk.Label(tambah_jendela, text="Tambah Transaksi", font=("Arial", 14, "bold")).pack(pady=10)
 
-        # Mengatur aksi ketika tombol "X" ditekan
-        self.popup_hasil.protocol("WM_DELETE_WINDOW", self.kembali_menu_utama_hasil)
+    # Pilih ikan
+    tk.Label(tambah_jendela, text="Pilih Ikan").pack(pady=5)
+    combo_ikan = ttk.Combobox(tambah_jendela, values=data_jenis_ikan, state='readonly')
+    combo_ikan.pack(pady=5)
+    
+    # Input jarak
+    tk.Label(tambah_jendela, text="Jarak").pack(pady=5)
+    entry_jarak = tk.Entry(tambah_jendela)
+    entry_jarak.pack(pady=5)
 
-    # Fungsi untuk kembali ke menu utama dari popup input
-    def kembali_menu_utama(self):
-        self.popup_input.destroy()  # Menutup jendela input
-        self.root.attributes('-disabled', False)  # Enable jendela utama
+    # Tombol Simpan dan Kembali
+    tk.Button(tambah_jendela, text="Simpan", command=simpan_transaksi).pack(pady=5)
+    tk.Button(tambah_jendela, text="Kembali", command=lambda: tambah_jendela.destroy()).pack()
 
-    # Fungsi untuk kembali ke menu utama dari popup hasil
-    def kembali_menu_utama_hasil(self):
-        self.popup_hasil.destroy()  # Menutup jendela hasil
-        self.root.attributes('-disabled', False)  # Enable jendela utama
+# Fungsi untuk kembali ke menu utama
+def kembali_ke_menu():
+    root.destroy()
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = IkanApp(root)
-    root.mainloop()
+# Membuat jendela utama
+root = tk.Tk()
+root.title("Data Transaksi Ikan")
+root.geometry("500x400")
+
+# Label judul
+label_judul = tk.Label(root, text="Transaksi Ikan", font=("Arial", 16, "bold"))
+label_judul.pack(pady=10)
+
+# Frame untuk List Transaksi
+frame_list = tk.Frame(root, borderwidth=1, relief="solid")
+frame_list.pack(pady=10, padx=10)
+
+tk.Label(frame_list, text="Ikan       Jarak", font=("Arial", 10, "bold")).pack()
+
+# List Transaksi
+listbox_transaksi = tk.Listbox(frame_list, width=40, height=10)
+listbox_transaksi.pack(side="left", padx=5)
+
+scrollbar = tk.Scrollbar(frame_list)
+scrollbar.pack(side="right", fill="y")
+listbox_transaksi.config(yscrollcommand=scrollbar.set)
+scrollbar.config(command=listbox_transaksi.yview)
+
+# Tombol Tambah Transaksi
+tk.Button(root, text="Tambah Transaksi", command=tambah_transaksi).pack(pady=10)
+
+# Tombol Kembali ke Menu
+tk.Button(root, text="Kembali ke Menu", command=kembali_ke_menu).pack(pady=10)
+
+# Load daftar transaksi ke listbox
+update_list_transaksi()
+
+# Menjalankan aplikasi
+root.mainloop()
