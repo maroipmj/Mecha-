@@ -132,55 +132,39 @@ def update_list_ikan():
     for i, ikan in enumerate(data_nama_ikan, start=1):
         listbox_ikan.insert(tk.END, f"{i}: {ikan}")
 
-# Fungsi untuk mengedit data ikan
+# Fungsi untuk mengedit hanya jenis ikan
 def edit_ikan():
     selected_index = listbox_ikan.curselection()
     if selected_index:
         index = selected_index[0]
 
         def simpan_perubahan():
-            nama = entry_nama.get()
-            jenis = entry_jenis.get()
-            warna = entry_warna.get()
-            if nama and jenis and warna:
-                # Memperbarui data ikan yang dipilih
-                data_nama_ikan[index] = nama
+            jenis = entry_jenis.get()  # Only species is editable
+            if jenis:
+                # Memperbarui jenis ikan yang dipilih
                 data_jenis_ikan[index] = jenis
-                data_warna_ikan[index] = warna
-                save_data(filename_nama, data_nama_ikan)
                 save_data(filename_jenis, data_jenis_ikan)
-                save_data(filename_warna, data_warna_ikan)
-                messagebox.showinfo("Berhasil", "Data berhasil diperbarui!")
+                messagebox.showinfo("Berhasil", "Jenis ikan berhasil diperbarui!")
                 update_list_ikan()  # Memperbarui listbox
                 edit_jendela.destroy()  # Menutup jendela edit
                 root.attributes('-disabled', False)  # Mengaktifkan kembali jendela utama
             else:
-                messagebox.showwarning("Peringatan", "Semua kolom harus diisi.")
+                messagebox.showwarning("Peringatan", "Kolom jenis ikan harus diisi.")
 
         def kembali():
             edit_jendela.destroy()
             root.attributes('-disabled', False)
 
-        # Membuat jendela untuk mengedit data ikan
+        # Membuat jendela untuk mengedit jenis ikan
         root.attributes('-disabled', True)
         edit_jendela = tk.Toplevel(root)
         edit_jendela.title("Edit Data Ikan")
         edit_jendela.geometry("300x200")
 
-        tk.Label(edit_jendela, text="Nama Ikan").pack()
-        entry_nama = tk.Entry(edit_jendela)
-        entry_nama.pack()
-        entry_nama.insert(0, data_nama_ikan[index])  # Menampilkan nama ikan yang dipilih
-
         tk.Label(edit_jendela, text="Jenis Ikan").pack()
         entry_jenis = tk.Entry(edit_jendela)
         entry_jenis.pack()
         entry_jenis.insert(0, data_jenis_ikan[index])  # Menampilkan jenis ikan yang dipilih
-
-        tk.Label(edit_jendela, text="Warna Ikan").pack()
-        entry_warna = tk.Entry(edit_jendela)
-        entry_warna.pack()
-        entry_warna.insert(0, data_warna_ikan[index])  # Menampilkan warna ikan yang dipilih
 
         tk.Button(edit_jendela, text="Simpan Perubahan", command=simpan_perubahan).pack(pady=10)
         tk.Button(edit_jendela, text="Kembali", command=kembali).pack(pady=5)
@@ -200,10 +184,10 @@ root.geometry("400x400")
 root.configure(bg="#E8EAF6")
 
 # Label judul
-label_judul = tk.Label(root, text="Data Jenis Ikan", font=("Arial", 16, "bold"), bg="#E8EAF6", fg="#5E35B1")
+label_judul = tk.Label(root, text="Data Jenis Ikan", font=("Arial", 16, "bold"), bg="#5E35B1", fg="white")
 label_judul.pack(pady=10)
 
-# List Ikan
+# Daftar ikan
 frame_list = tk.Frame(root, bg="#E8EAF6")
 frame_list.pack()
 
@@ -215,7 +199,7 @@ scrollbar.pack(side="right", fill="y")
 listbox_ikan.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=listbox_ikan.yview)
 
-# Tombol Tambah, Hapus, Detail, Edit
+# Tombol tambah, detail, edit, hapus
 frame_buttons = tk.Frame(root, bg="#E8EAF6")
 frame_buttons.pack(pady=10)
 
@@ -227,9 +211,8 @@ tk.Button(frame_buttons, text="Hapus", command=hapus_ikan, bg="#F44336", fg="whi
 # Tombol kembali
 tk.Button(root, text="Kembali", command=kembali_ke_menu, bg="#B0BEC5", fg="black", width=15).pack(pady=8)
 
-# Load daftar ikan ke listbox
+# Memuat daftar ikan ke listbox
 update_list_ikan()
 
 # Menjalankan aplikasi
 root.mainloop()
-
