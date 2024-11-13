@@ -1,2 +1,4 @@
-item
+hitam
 pink
+merah
+biru
