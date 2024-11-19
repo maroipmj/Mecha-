@@ -81,28 +81,29 @@ def tambah_transaksi():
     tambah_jendela = tk.Toplevel(root)
     tambah_jendela.title("Tambah Transaksi")
     tambah_jendela.geometry("300x300")
-    
+    tambah_jendela.configure(bg="#E8EAF6")
+
     # Label Judul
-    tk.Label(tambah_jendela, text="Tambah Transaksi", font=("Arial", 14, "bold")).pack(pady=10)
+    tk.Label(tambah_jendela, text="Tambah Transaksi", font=("Arial", 14, "bold"), bg="#E8EAF6").pack(pady=10)
 
     # Pilih ikan
-    tk.Label(tambah_jendela, text="Pilih Ikan").pack(pady=5)
+    tk.Label(tambah_jendela, text="Pilih Ikan", bg="#E8EAF6").pack(pady=5)
     combo_ikan = ttk.Combobox(tambah_jendela, values=data_jenis_ikan, state='readonly')
     combo_ikan.pack(pady=5)
     
     # Input jarak
-    tk.Label(tambah_jendela, text="Jarak (km)").pack(pady=5)
+    tk.Label(tambah_jendela, text="Jarak (km)", bg="#E8EAF6").pack(pady=5)
     entry_jarak = tk.Entry(tambah_jendela)
     entry_jarak.pack(pady=5)
 
     # Input waktu
-    tk.Label(tambah_jendela, text="Waktu (jam)").pack(pady=5)
+    tk.Label(tambah_jendela, text="Waktu (jam)", bg="#E8EAF6").pack(pady=5)
     entry_waktu = tk.Entry(tambah_jendela)
     entry_waktu.pack(pady=5)
 
     # Tombol Simpan dan Kembali
-    tk.Button(tambah_jendela, text="Simpan", command=simpan_transaksi).pack(pady=5)
-    tk.Button(tambah_jendela, text="Kembali", command=lambda: tambah_jendela.destroy()).pack()
+    tk.Button(tambah_jendela, text="Simpan", command=simpan_transaksi, bg="#4CAF50", fg="white", width=10).pack(pady=10)
+    tk.Button(tambah_jendela, text="Kembali", command=lambda: tambah_jendela.destroy(), bg="#B0BEC5", fg="black", width=10).pack(pady=5)
 
 # Fungsi untuk kembali ke menu utama
 def kembali():
@@ -112,16 +113,17 @@ def kembali():
 root = tk.Tk()
 root.title("Data Transaksi Ikan")
 root.geometry("600x400")
+root.configure(bg="#E8EAF6")
 
 # Label judul
-label_judul = tk.Label(root, text="Transaksi Ikan", font=("Arial", 16, "bold"))
+label_judul = tk.Label(root, text="Transaksi Ikan", font=("Arial", 16, "bold"), bg="#5E35B1", fg="white")
 label_judul.pack(pady=10)
 
 # Frame untuk List Transaksi
-frame_list = tk.Frame(root, borderwidth=1, relief="solid")
+frame_list = tk.Frame(root, bg="#E8EAF6")
 frame_list.pack(pady=10, padx=10)
 
-tk.Label(frame_list, text="Ikan       Jarak    Waktu    Kecepatan", font=("Arial", 10, "bold")).pack()
+tk.Label(frame_list, text="Ikan       Jarak    Waktu    Kecepatan", font=("Arial", 10, "bold"), bg="#E8EAF6").pack()
 
 # List Transaksi
 listbox_transaksi = tk.Listbox(frame_list, width=60, height=10)
@@ -133,10 +135,10 @@ listbox_transaksi.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=listbox_transaksi.yview)
 
 # Tombol Tambah Transaksi
-tk.Button(root, text="Tambah Transaksi", command=tambah_transaksi).pack(pady=10)
+tk.Button(root, text="Tambah Transaksi", command=tambah_transaksi, bg="#4CAF50", fg="white", width=15).pack(pady=10)
 
 # Tombol Kembali
-tk.Button(root, text="Kembali", command=kembali).pack(pady=10)
+tk.Button(root, text="Kembali", command=kembali, bg="#B0BEC5", fg="black", width=15).pack(pady=10)
 
 # Load daftar transaksi ke listbox
 update_list_transaksi()
