@@ -1,41 +1,22 @@
 import tkinter as tk
 from tkinter import messagebox
-import threading
 
-# Fungsi untuk menjalankan file Python eksternal di thread terpisah
+# Fungsi untuk menjalankan file Python eksternal
 def buka_file_py(filename):
-    def run_file():
-        try:
-            # Membaca dan menjalankan kode dari file Python eksternal
-            with open(filename, "r") as file:
-                code = file.read()
-                exec(code, globals())  # Menjalankan kode dalam konteks global aplikasi utama
-        except FileNotFoundError:
-            messagebox.showerror("Error", f"File '{filename}' tidak ditemukan.")
-        except Exception as e:
-            messagebox.showerror("Error", f"Gagal membuka {filename}.\nError: {str(e)}")
-        finally:
-            # Aktifkan kembali semua tombol setelah selesai menjalankan file Python
-            set_tombol_state("normal")
-
-    # Nonaktifkan semua tombol saat file Python sedang diproses
-    set_tombol_state("disabled")
-    
-    # Menjalankan fungsi di thread terpisah
-    threading.Thread(target=run_file).start()
+    try:
+        # Membaca dan menjalankan kode dari file Python eksternal
+        with open(filename, "r") as file:
+            code = file.read()
+            exec(code, globals())  # Menjalankan kode dalam konteks global aplikasi utama
+    except FileNotFoundError:
+        messagebox.showerror("Error", f"File '{filename}' tidak ditemukan.")
+    except Exception as e:
+        messagebox.showerror("Error", f"Gagal membuka {filename}.\nError: {str(e)}")
 
 # Fungsi untuk menutup aplikasi
 def keluar_aplikasi():
     if messagebox.askokcancel("Keluar", "Apakah Anda yakin ingin keluar?"):
         root.destroy()
-
-# Fungsi untuk mengatur status tombol
-def set_tombol_state(state):
-    btn_ikan.config(state=state)
-    btn_jenis.config(state=state)
-    btn_warna.config(state=state)
-    btn_transaksi.config(state=state)
-    btn_keluar.config(state=state)
 
 # Membuat jendela utama
 root = tk.Tk()
