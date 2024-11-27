@@ -185,8 +185,8 @@ def hapus_ikan():
 # Fungsi untuk memperbarui daftar ikan di listbox
 def update_list_ikan():
     listbox_ikan.delete(0, tk.END)
-    for i, ikan in enumerate(data_nama_ikan, start=1):
-        listbox_ikan.insert(tk.END, f"{i}: {ikan}")
+    for ikan in data_nama_ikan:
+        listbox_ikan.insert(tk.END, ikan)
 
 # Fungsi untuk kembali ke menu utama
 def kembali_ke_menu():
@@ -194,12 +194,12 @@ def kembali_ke_menu():
 
 # Membuat jendela utama
 root = tk.Tk()
-root.title("Data Jenis Ikan")
+root.title("Data Ikan")
 root.geometry("400x400")
 root.configure(bg="#e6e6fa")
 
 # Label judul
-label_judul = tk.Label(root, text="Data Jenis Ikan", font=("Arial", 16, "bold"), bg="#e6e6fa", fg="#6a0dad")
+label_judul = tk.Label(root, text="Data Ikan", font=("Arial", 16, "bold"), bg="#e6e6fa", fg="#6a0dad")
 label_judul.pack(pady=10)
 
 # List Ikan
@@ -217,6 +217,7 @@ scrollbar.config(command=listbox_ikan.yview)
 # Tombol Tambah, Detail, Hapus, Edit
 frame_buttons = tk.Frame(root, bg="#e6e6fa")
 frame_buttons.pack(pady=10)
+
 
 tk.Button(frame_buttons, text="Tambah", command=tambah_ikan, bg="#66cdaa", fg="white", width=8).grid(row=0, column=0, padx=5)
 tk.Button(frame_buttons, text="Detail", command=detail_ikan, bg="#ffd700", fg="black", width=8).grid(row=0, column=1, padx=5, pady=5)
