@@ -1,227 +1,240 @@
 import os
 
 class DataIkan:
-    def __init__(self, file_nama, file_jenis, file_warna):
+    def __init__(self, file_nama, file_jenis, file_warna, file_jarak):
         self.file_nama = file_nama
         self.file_jenis = file_jenis
         self.file_warna = file_warna
-        self.data_ikan = []
-        self.jenis_ikan = []
-        self.warna_ikan = []
-        self.load_data()
+        self.file_jarak = file_jarak
 
-    def load_data(self):
-        """Memuat data dari file."""
-        # Memuat nama ikan
-        if os.path.exists(self.file_nama):
-            with open(self.file_nama, 'r') as f:
-                self.data_ikan = [line.strip() for line in f if line.strip()]
-
-        # Memuat jenis ikan
-        if os.path.exists(self.file_jenis):
-            with open(self.file_jenis, 'r') as f:
-                self.jenis_ikan = [line.strip() for line in f if line.strip()]
-
-        # Memuat warna ikan
-        if os.path.exists(self.file_warna):
-            with open(self.file_warna, 'r') as f:
-                self.warna_ikan = [line.strip() for line in f if line.strip()]
-
-    def simpan_data_ikan(self):
-        """Simpan nama ikan ke file."""
-        with open(self.file_nama, 'w') as f:
-            for nama in self.data_ikan:
-                f.write(f"{nama}\n")
+    def _load_file(self, file_path):
+        """Memuat data dari file dengan format nomor: data."""
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as f:
+                return [line.strip().split(": ", 1)[1] for line in f if ": " in line]
+        return []
 
     def lihat_data_ikan(self):
-        """Menampilkan semua data ikan dengan jenis dan warna."""
-        if self.data_ikan:
+        """Membaca semua file dan menampilkan data ikan."""
+        data_nama = self._load_file(self.file_nama)
+        data_jenis = self._load_file(self.file_jenis)
+        data_warna = self._load_file(self.file_warna)
+        data_jarak = self._load_file(self.file_jarak)
+
+        if data_nama and data_jenis and data_warna and data_jarak:
             print("\nData Ikan:")
-            for idx, nama in enumerate(self.data_ikan, start=1):
-                jenis = self.jenis_ikan[idx % len(self.jenis_ikan)]  # Pilihan jenis secara berurutan
-                warna = self.warna_ikan[idx % len(self.warna_ikan)]  # Pilihan warna secara berurutan
-                print(f"{idx}. Nama: {nama}, Jenis: {jenis}, Warna: {warna}")
+            for idx, (nama, jenis, warna, jarak) in enumerate(zip(data_nama, data_jenis, data_warna, data_jarak), start=1):
+                print(f"{idx}. Nama: {nama}, Jenis: {jenis}, Warna: {warna}, Jarak: {jarak}")
         else:
-            print("\nData ikan kosong.")
+            print("\nData ikan kosong atau file tidak lengkap.")
 
     def tambah_data_ikan(self):
-        """Menambah nama ikan baru."""
+        """Menambah data ikan baru."""
         nama = input("Masukkan nama ikan: ")
-        
-        # Pilih jenis ikan
+
+        # Pilih jenis ikan dari file yang sudah ada
+        data_jenis = self._load_file(self.file_jenis)
         print("\nPilih jenis ikan:")
-        for idx, jenis in enumerate(self.jenis_ikan, start=1):
+        for idx, jenis in enumerate(data_jenis, start=1):
             print(f"{idx}. {jenis}")
         try:
             jenis_idx = int(input("Masukkan nomor jenis ikan: ")) - 1
-            if not (0 <= jenis_idx < len(self.jenis_ikan)):
+            if not (0 <= jenis_idx < len(data_jenis)):
                 print("Pilihan jenis tidak valid.")
                 return
         except ValueError:
             print("Input harus berupa angka.")
             return
-        jenis = self.jenis_ikan[jenis_idx]
+        jenis = data_jenis[jenis_idx]
 
-        # Pilih warna ikan
+        # Pilih warna ikan dari file yang sudah ada
+        data_warna = self._load_file(self.file_warna)
         print("\nPilih warna ikan:")
-        for idx, warna in enumerate(self.warna_ikan, start=1):
+        for idx, warna in enumerate(data_warna, start=1):
             print(f"{idx}. {warna}")
         try:
             warna_idx = int(input("Masukkan nomor warna ikan: ")) - 1
-            if not (0 <= warna_idx < len(self.warna_ikan)):
+            if not (0 <= warna_idx < len(data_warna)):
                 print("Pilihan warna tidak valid.")
                 return
         except ValueError:
             print("Input harus berupa angka.")
             return
-        warna = self.warna_ikan[warna_idx]
+        warna = data_warna[warna_idx]
 
-        # Tambahkan data ikan
-        self.data_ikan.append(f"{nama} - {jenis} - {warna}")
-        self.simpan_data_ikan()
+        # Input jarak ikan
+        try:
+            jarak = float(input("Masukkan jarak ikan (dalam km/jam): "))
+        except ValueError:
+            print("Input jarak harus berupa angka.")
+            return
+
+        # Tambahkan data baru ke file nama_ikan.txt dan jarak_tempuh.txt (jenis dan warna tidak ditambahkan)
+        self._append_to_file(self.file_nama, nama)
+        self._append_to_file(self.file_jarak, f"{jarak} km/jam")
+
         print("\nData ikan berhasil ditambahkan.")
+
+    def _append_to_file(self, file_path, data):
+        """Menambahkan data ke file dengan format nomor: data."""
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+            next_index = len(lines) + 1
+        else:
+            next_index = 1
+        with open(file_path, 'a') as f:
+            f.write(f"{next_index}: {data}\n")
+
+    def edit_data_ikan(self):
+        """Mengedit data ikan berdasarkan nomor."""
+        data_nama = self._load_file(self.file_nama)
+        data_jarak = self._load_file(self.file_jarak)
+        data_jenis = self._load_file(self.file_jenis)
+        data_warna = self._load_file(self.file_warna)
+
+        if data_nama and data_jarak:
+            print("\nData Ikan:")
+            for idx, (nama, jenis, warna, jarak) in enumerate(zip(data_nama, data_jenis, data_warna, data_jarak), start=1):
+                print(f"{idx}. Nama: {nama}, Jenis: {jenis}, Warna: {warna}, Jarak: {jarak}")
+            try:
+                idx = int(input("Masukkan nomor ikan yang ingin diedit: ")) - 1
+                if 0 <= idx < len(data_nama):
+                    # Edit nama ikan
+                    data_nama[idx] = input(f"Nama baru (sebelumnya: {data_nama[idx]}): ") or data_nama[idx]
+
+                    # Pilih jenis baru
+                    print("\nPilih jenis ikan:")
+                    for jdx, jenis in enumerate(data_jenis, start=1):
+                        print(f"{jdx}. {jenis}")
+                    try:
+                        jenis_idx = int(input("Masukkan nomor jenis ikan: ")) - 1
+                        if 0 <= jenis_idx < len(data_jenis):
+                            data_jenis[idx] = data_jenis[jenis_idx]
+                        else:
+                            print("Pilihan jenis tidak valid.")
+                            return
+                    except ValueError:
+                        print("Input harus berupa angka.")
+                        return
+
+                    # Pilih warna baru
+                    print("\nPilih warna ikan:")
+                    for wdx, warna in enumerate(data_warna, start=1):
+                        print(f"{wdx}. {warna}")
+                    try:
+                        warna_idx = int(input("Masukkan nomor warna ikan: ")) - 1
+                        if 0 <= warna_idx < len(data_warna):
+                            data_warna[idx] = data_warna[warna_idx]
+                        else:
+                            print("Pilihan warna tidak valid.")
+                            return
+                    except ValueError:
+                        print("Input harus berupa angka.")
+                        return
+
+                    # Edit jarak ikan
+                    try:
+                        data_jarak[idx] = f"{float(input(f'Jarak baru (km/jam, sebelumnya: {data_jarak[idx]}): '))} km/jam"
+                    except ValueError:
+                        print("Input jarak harus berupa angka.")
+                        return
+
+                    # Simpan ulang file
+                    self._save_to_file(self.file_nama, data_nama)
+                    self._save_to_file(self.file_jarak, data_jarak)
+                    self._save_to_file(self.file_jenis, data_jenis)
+                    self._save_to_file(self.file_warna, data_warna)
+
+                    print("Data ikan berhasil diperbarui.")
+                else:
+                    print("Nomor ikan tidak valid.")
+            except ValueError:
+                print("Input harus berupa angka.")
+        else:
+            print("\nData ikan kosong.")
+
+    def _save_to_file(self, file_path, data):
+        """Menyimpan ulang data ke file dengan format nomor: data."""
+        with open(file_path, 'w') as f:
+            for idx, item in enumerate(data, start=1):
+                f.write(f"{idx}: {item}\n")
 
     def hapus_data_ikan(self):
         """Menghapus data ikan berdasarkan nomor."""
-        self.lihat_data_ikan()
-        if self.data_ikan:
+        data_nama = self._load_file(self.file_nama)
+        data_jarak = self._load_file(self.file_jarak)
+        data_jenis = self._load_file(self.file_jenis)
+        data_warna = self._load_file(self.file_warna)
+
+        if data_nama and data_jarak:
+            print("\nData Ikan:")
+            for idx, (nama, jenis, warna, jarak) in enumerate(zip(data_nama, data_jenis, data_warna, data_jarak), start=1):
+                print(f"{idx}. Nama: {nama}, Jenis: {jenis}, Warna: {warna}, Jarak: {jarak}")
             try:
                 idx = int(input("Masukkan nomor ikan yang ingin dihapus: ")) - 1
-                if 0 <= idx < len(self.data_ikan):
-                    self.data_ikan.pop(idx)
-                    self.simpan_data_ikan()
+                if 0 <= idx < len(data_nama):
+                    # Hapus data ikan dengan menghapus data pada masing-masing list
+                    del data_nama[idx]
+                    del data_jenis[idx]
+                    del data_warna[idx]
+                    del data_jarak[idx]
+
+                    # Simpan ulang file tanpa data yang dihapus
+                    self._save_to_file(self.file_nama, data_nama)
+                    self._save_to_file(self.file_jarak, data_jarak)
+                    self._save_to_file(self.file_jenis, data_jenis)
+                    self._save_to_file(self.file_warna, data_warna)
+
                     print("Data ikan berhasil dihapus.")
                 else:
                     print("Nomor ikan tidak valid.")
             except ValueError:
                 print("Input harus berupa angka.")
-
-    def menu_jenis_ikan(self):
-        """Menu untuk jenis ikan."""
-        while True:
-            print("\nMenu Jenis Ikan:")
-            print("1. Lihat jenis ikan")
-            print("2. Tambah jenis ikan")
-            print("3. Hapus jenis ikan")
-            print("4. Kembali")
-            pilihan = input("Pilih opsi: ")
-            if pilihan == '1':
-                print("\nJenis Ikan:")
-                for idx, jenis in enumerate(self.jenis_ikan, start=1):
-                    print(f"{idx}. {jenis}")
-            elif pilihan == '2':
-                jenis_baru = input("Masukkan jenis ikan baru: ")
-                if jenis_baru not in self.jenis_ikan:
-                    self.jenis_ikan.append(jenis_baru)
-                    with open(self.file_jenis, 'a') as f:
-                        f.write(f"{jenis_baru}\n")
-                    print("Jenis ikan berhasil ditambahkan.")
-                else:
-                    print("Jenis ikan sudah ada.")
-            elif pilihan == '3':
-                self.hapus_jenis_ikan()
-            elif pilihan == '4':
-                break
-            else:
-                print("Pilihan tidak valid.")
-
-    def hapus_jenis_ikan(self):
-        """Menghapus jenis ikan berdasarkan nomor."""
-        print("\nJenis Ikan:")
-        for idx, jenis in enumerate(self.jenis_ikan, start=1):
-            print(f"{idx}. {jenis}")
-        try:
-            idx = int(input("Masukkan nomor jenis ikan yang ingin dihapus: ")) - 1
-            if 0 <= idx < len(self.jenis_ikan):
-                self.jenis_ikan.pop(idx)
-                with open(self.file_jenis, 'w') as f:
-                    for jenis in self.jenis_ikan:
-                        f.write(f"{jenis}\n")
-                print("Jenis ikan berhasil dihapus.")
-            else:
-                print("Nomor jenis ikan tidak valid.")
-        except ValueError:
-            print("Input harus berupa angka.")
-
-    def menu_warna_ikan(self):
-        """Menu untuk warna ikan."""
-        while True:
-            print("\nMenu Warna Ikan:")
-            print("1. Lihat warna ikan")
-            print("2. Tambah warna ikan")
-            print("3. Hapus warna ikan")
-            print("4. Kembali")
-            pilihan = input("Pilih opsi: ")
-            if pilihan == '1':
-                print("\nWarna Ikan:")
-                for idx, warna in enumerate(self.warna_ikan, start=1):
-                    print(f"{idx}. {warna}")
-            elif pilihan == '2':
-                warna_baru = input("Masukkan warna ikan baru: ")
-                if warna_baru not in self.warna_ikan:
-                    self.warna_ikan.append(warna_baru)
-                    with open(self.file_warna, 'a') as f:
-                        f.write(f"{warna_baru}\n")
-                    print("Warna ikan berhasil ditambahkan.")
-                else:
-                    print("Warna ikan sudah ada.")
-            elif pilihan == '3':
-                self.hapus_warna_ikan()
-            elif pilihan == '4':
-                break
-            else:
-                print("Pilihan tidak valid.")
-
-    def hapus_warna_ikan(self):
-        """Menghapus warna ikan berdasarkan nomor."""
-        print("\nWarna Ikan:")
-        for idx, warna in enumerate(self.warna_ikan, start=1):
-            print(f"{idx}. {warna}")
-        try:
-            idx = int(input("Masukkan nomor warna ikan yang ingin dihapus: ")) - 1
-            if 0 <= idx < len(self.warna_ikan):
-                self.warna_ikan.pop(idx)
-                with open(self.file_warna, 'w') as f:
-                    for warna in self.warna_ikan:
-                        f.write(f"{warna}\n")
-                print("Warna ikan berhasil dihapus.")
-            else:
-                print("Nomor warna ikan tidak valid.")
-        except ValueError:
-            print("Input harus berupa angka.")
+        else:
+            print("\nData ikan kosong.")
 
 def main():
-    data_ikan = DataIkan('nama_ikan.txt', 'nama_jenis.txt', 'nama_warna.txt')
+    data_ikan = DataIkan('nama_ikan.txt', 'nama_jenis.txt', 'nama_warna.txt', 'jarak_tempuh.txt')
 
     while True:
         print("\nMenu Utama:")
         print("1. Data Ikan")
         print("2. Jenis Ikan")
         print("3. Warna Ikan")
-        print("4. Keluar")
+        print("4. Jarak Ikan")
+        print("5. Keluar")
         pilihan = input("Pilih opsi: ")
+
         if pilihan == '1':
             print("\nMenu Data Ikan:")
             print("1. Lihat data ikan")
             print("2. Tambah data ikan")
-            print("3. Hapus data ikan")
-            print("4. Kembali")
+            print("3. Edit data ikan")
+            print("4. Hapus data ikan")
             sub_pilihan = input("Pilih opsi: ")
             if sub_pilihan == '1':
                 data_ikan.lihat_data_ikan()
             elif sub_pilihan == '2':
                 data_ikan.tambah_data_ikan()
             elif sub_pilihan == '3':
-                data_ikan.hapus_data_ikan()
+                data_ikan.edit_data_ikan()
             elif sub_pilihan == '4':
-                continue
-            else:
-                print("Pilihan tidak valid.")
+                data_ikan.hapus_data_ikan()
+
         elif pilihan == '2':
-            data_ikan.menu_jenis_ikan()
+            print("\nMenu Jenis Ikan:")
+            # Implementasi untuk menu jenis ikan di sini
+
         elif pilihan == '3':
-            data_ikan.menu_warna_ikan()
+            print("\nMenu Warna Ikan:")
+            # Implementasi untuk menu warna ikan di sini
+
         elif pilihan == '4':
+            print("\nMenu Jarak Ikan:")
+            # Implementasi untuk menu jarak ikan di sini
+
+        elif pilihan == '5':
             print("Terima kasih telah menggunakan program.")
             break
         else:
