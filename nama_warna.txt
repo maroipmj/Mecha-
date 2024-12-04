@@ -1,4 +1,4 @@
-hitam
-pink
-merah
-biru
+1:hitam
+2:pink
+3:merah
+4:biru

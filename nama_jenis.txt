@@ -1,4 +1,4 @@
-hiu
-koi
-lele
-duyung
+1:hiu
+2:koi
+3:lele
+4:duyung
