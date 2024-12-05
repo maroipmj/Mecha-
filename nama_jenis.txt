@@ -1,4 +1,4 @@
-1:hiu
-2:koi
-3:lele
-4:duyung
+1: Hiu
+2: Koi
+3: Lele
+4: Duyung
