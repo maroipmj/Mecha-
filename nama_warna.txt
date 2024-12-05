@@ -1,4 +1,4 @@
-1:hitam
-2:pink
-3:merah
-4:biru
+1: Merah
+2: Pink
+3: Hijau
+4: Biru
