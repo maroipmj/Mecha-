@@ -1,5 +1,8 @@
-kecepatan , waktu , jarak
-
-2 m/s,10 detik,20.00 meter
-1.5 m/s,30 detik,45.00 meter
-3 m/s,15 detik,45.00 meter
+1:  10km/jam
+2:  30km/jam
+3:  50km/jam
+8:  23.0 km/jam
+6:  34.0 km/jam
+7:  22.0 km/jam
+10: 233
+11: 2233

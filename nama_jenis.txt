@@ -1,4 +1,5 @@
-hiu
-koi
-lele
-duyung
+1: hiu
+2: lele
+3: duyung
+4: koi
+5: koda

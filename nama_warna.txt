@@ -1,4 +1,5 @@
-hitam
-pink
-merah
-biru
+1: hijau
+2: pink
+3: ungu
+5: oren
+4:hijau
