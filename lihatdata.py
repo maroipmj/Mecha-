@@ -151,3 +151,4 @@ def lihat_data():
     tk.Button(root, text="Kembali", command=root.destroy, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=10)
 
     root.mainloop()
+    
