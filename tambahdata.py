@@ -106,4 +106,4 @@ def tambah_data():
         tk.Button(menu_window, text="Tambah Data Jenis", command=lambda: [menu_window.destroy(), tambah_data_jenis()], bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
         tk.Button(menu_window, text="Kembali", command=menu_window.destroy, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=10)
 
-    menu_tambah_data()
+    menu_tambah_data() 
