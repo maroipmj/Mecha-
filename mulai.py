@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+<<<<<<< HEAD
 from tkinter import ttk  # Untuk Treeview
 
 # Fungsi untuk membaca data dari file teks dan mengabaikan angka di awal baris
@@ -70,6 +71,9 @@ def lihat_data_seluruhnya():
     btn_kembali = tk.Button(window_data, text="Kembali", command=window_data.destroy, bg="#ff6666", font=("Arial", 12, "bold"))
     btn_kembali.pack(side="bottom", pady=10)
 
+=======
+
+>>>>>>> 20c38400cb29301d776868643be0b238d7fc32b8
 # Fungsi untuk menjalankan file Python eksternal
 def buka_file_py(filename):
     try:

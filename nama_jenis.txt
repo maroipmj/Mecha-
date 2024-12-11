@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 1: hiu
 2: lele
 3: duyung
 4: koi
 5: koda
+=======
+1: Hiu
+2: Koi
+3: Lele
+4: Duyung
+>>>>>>> 20c38400cb29301d776868643be0b238d7fc32b8

@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 1: hijau
 2: pink
 3: ungu
 5: oren
 4:hijau
+=======
+1: Merah
+2: Pink
+3: Hijau
+4: Biru
+>>>>>>> 20c38400cb29301d776868643be0b238d7fc32b8
