@@ -1,155 +1,470 @@
-import tkinter as tk
-from tkinter import messagebox
+def tampil_menu():
+    print("\nData Ikan")
+    print("1.   Tampil data")    
+    print("2.   Tambah data")
+    print("3.   Edit data")
+    print("4.   Hapus data")
+    print("5.   Keluar")
+    pilih = input("Masukkan pilihan Anda: ")
+    return pilih
 
-# Fungsi untuk membaca data ikan dari file
-def baca_data_ikan(file_path):
+def tampil_menu_tambah():
+    print("\nTambah Data")
+    print("1.   Tambah Ikan")    
+    print("2.   Tambah Warna")
+    print("3.   Tambah Jenis")
+    print("4.   Kembali")
+    pilih = input("Masukkan pilihan Anda: ")
+    return pilih
+
+def tampil_menu_edit():
+    print("\nEdit Data")
+    print("1.   Edit Ikan")    
+    print("2.   Edit Warna")
+    print("3.   Edit Jenis")
+    print("4.   Kembali")
+    pilih = input("Masukkan pilihan Anda: ")
+    return pilih
+
+def tampil_menu_hapus():
+    print("\nHapus Data")
+    print("1.   Hapus Data Ikan")    
+    print("2.   Hapus Warna")
+    print("3.   Hapus Jenis")
+    print("4.   Kembali")
+    pilih = input("Masukkan pilihan Anda: ")
+    return pilih
+
+def baca_data_ikan(file_name):
+    """Fungsi untuk membaca file nama_ikan.txt dengan format 'id:nama,id_warna,id_jenis'."""
     data = {}
     try:
-        with open(file_path, "r") as file:
+        with open(file_name, "r") as file:
             for line in file:
                 line = line.strip()
-                if line:
-                    try:
-                        kode, detail = line.split(":")
-                        nama, id_warna, id_jenis = detail.split(",")
-                        data[int(kode)] = {
-                            "nama": nama.strip(),
-                            "id_warna": int(id_warna.strip()),
-                            "id_jenis": int(id_jenis.strip()),
-                        }
-                    except ValueError:
-                        # Abaikan baris yang tidak sesuai format
-                        continue
+                if not line:
+                    continue
+                parts = line.split(":", 1)
+                if len(parts) != 2:
+                    print(f"Baris salah di file {file_name}: {line}")
+                    continue
+                kode = parts[0]
+                detail = parts[1].split(",")  
+                if len(detail) != 3:
+                    print(f"Baris salah di file {file_name}: {line}")
+                    continue
+                data[kode] = {"nama": detail[0], "id_warna": detail[1], "id_jenis": detail[2]}
     except FileNotFoundError:
-        messagebox.showerror("Error", f"File {file_path} tidak ditemukan!")
-    return data
-
-# Fungsi untuk membaca data umum (warna/jenis) dari file
-def baca_data_file(file_path):
-    data = {}
-    try:
-        with open(file_path, "r") as file:
-            for line in file:
-                line = line.strip()
-                if line:
-                    try:
-                        kode, nama = line.split(":")
-                        data[int(kode)] = nama.strip()
-                    except ValueError:
-                        # Abaikan baris yang tidak sesuai format
-                        continue
-    except FileNotFoundError:
-        messagebox.showerror("Error", f"File {file_path} tidak ditemukan!")
-    return data
-
-# Fungsi untuk membaca data jarak_tempuh dari file (format string)
-def baca_data_jarak_tempuh(file_path):
-    data = {}
-    try:
-        with open(file_path, "r") as file:
-            for line in file:
-                line = line.strip()
-                if line:
-                    try:
-                        kode, jarak = line.split(":")
-                        data[int(kode)] = jarak.strip()  # Simpan dalam bentuk string
-                    except ValueError:
-                        # Abaikan baris yang tidak sesuai format
-                        continue
-    except FileNotFoundError:
-        messagebox.showerror("Error", f"File {file_path} tidak ditemukan!")
-    return data
-
-def lihat_data():
-    def tampilkan_tabel(judul, data, headers, row_formatter):
-        if not data:
-            messagebox.showerror("Error", f"Tidak ada {judul} yang ditemukan!")
-            return
-
-        tabel_window = tk.Toplevel()
-        tabel_window.title(judul)
-        tabel_window.configure(bg='#87CEFA')  # Latar belakang biru langit
-        tabel_window.geometry("800x600")  # Ukuran jendela yang lebih besar
-
-        # Judul
-        tk.Label(tabel_window, text=judul, font=("Arial", 18, "bold"), bg='#87CEFA').pack(pady=10)
-
-        # Membuat Treeview untuk tampilan tabel yang lebih baik
-        import tkinter.ttk as ttk
-
-        # Membuat Frame untuk Treeview
-        tree_frame = tk.Frame(tabel_window)
-        tree_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-
-        # Scrollbar
-        tree_scroll = ttk.Scrollbar(tree_frame)
-        tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-
-        # Treeview
-        tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, columns=headers, show='headings')
-        tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        # Konfigurasi scrollbar
-        tree_scroll.config(command=tree.yview)
-
-        # Konfigurasi header
-        for header in headers:
-            tree.heading(header, text=header)
-            tree.column(header, width=100, anchor='center')
-
-        # Isi data
-        for kode, detail in data.items():
-            try:
-                values = row_formatter(kode, detail)
-                tree.insert('', 'end', values=values)
-            except KeyError as e:
-                tree.insert('', 'end', values=[f"Error: {e}"])
-
-        # Tombol kembali
-        tk.Button(tabel_window, text="Kembali", command=tabel_window.destroy, 
-                  width=20, font=("Arial", 12), bg="#4682B4", fg="white").pack(pady=10)
-
-    def tampilkan_data_ikan():
-        tampilkan_tabel("Data Ikan", data_ikan, headers_ikan, lambda kode, detail: [
-            kode,
-            detail.get("nama", "Tidak Diketahui"),
-            data_warna.get(detail.get("id_warna", -1), "Tidak Diketahui"),
-            data_jenis.get(detail.get("id_jenis", -1), "Tidak Diketahui"),
-            data_jarak.get(kode, "Tidak Diketahui")
-        ])
-
-    def tampilkan_data_warna():
-        tampilkan_tabel("Data Warna", data_warna, headers_warna, lambda kode, nama: [kode, nama])
-
-    def tampilkan_data_jenis():
-        tampilkan_tabel("Data Jenis", data_jenis, headers_jenis, lambda kode, nama: [kode, nama])
-
-    # Load data
-    try:
-        data_ikan = baca_data_ikan("nama_ikan.txt")
-        data_warna = baca_data_file("nama_warna.txt")
-        data_jenis = baca_data_file("nama_jenis.txt")
-        data_jarak = baca_data_jarak_tempuh("jarak_tempuh.txt")
+        print(f"File {file_name} tidak ditemukan.")
     except Exception as e:
-        messagebox.showerror("Error", f"Terjadi kesalahan saat membaca file: {e}")
+        print(f"Terjadi kesalahan saat membaca file {file_name}: {e}")
+    return data
+
+def baca_data_file(file_name):
+    """Fungsi untuk membaca file warna/jenis dengan format 'id:nama'."""
+    data = {}
+    try:
+        with open(file_name, "r") as file:
+            for line in file:
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split(":", 1)
+                if len(parts) != 2:
+                    print(f"Baris salah di file {file_name}: {line}")
+                    continue
+                data[parts[0]] = parts[1].strip()
+    except FileNotFoundError:
+        print(f"File {file_name} tidak ditemukan.")
+    except Exception as e:
+        print(f"Terjadi kesalahan saat membaca file {file_name}: {e}")
+    return data
+
+def simpan_data_ke_file(file_name, data_baru):
+    """Fungsi untuk menambahkan data ke file."""
+    try:
+        with open(file_name, "a") as file:
+            file.write(data_baru + "\n")
+    except Exception as e:
+        print(f"Terjadi kesalahan saat menyimpan data ke file {file_name}: {e}")
+
+def tampil_data(data_ikan, data_warna, data_jenis):
+    """Fungsi untuk menampilkan data ikan lengkap."""
+    print('\nData Ikan')
+    print('--------------------------------------------------------------------------------')
+    print('|    Kode Ikan   |    Nama Ikan   |   Warna Ikan   |   Jenis Ikan   |')
+    print('--------------------------------------------------------------------------------')
+
+    if len(data_ikan) == 0:
+        print('             Tidak ada data                       ')
+    else:
+        for kode, detail in data_ikan.items():
+            nama = detail["nama"]
+            warna = data_warna.get(detail["id_warna"], "Tidak Diketahui")
+            jenis = data_jenis.get(detail["id_jenis"], "Tidak Diketahui")
+            print('|', kode.ljust(15), "|", 
+                  nama.ljust(15), "|", 
+                  warna.ljust(15), "|", 
+                  jenis.ljust(15), "|")
+
+    print('--------------------------------------------------------------------------------')
+    input("Tekan enter untuk melanjutkan.")
+
+def tambah_data(data_ikan, data_warna, data_jenis):
+    """Fungsi untuk menambahkan data ikan baru."""
+    print("\n--- Tambah Data Ikan Baru ---")
+
+    # Tentukan kode ikan baru
+    if len(data_ikan) == 0:
+        kode_baru = "1"
+    else:
+        kode_baru = str(int(max(data_ikan.keys())) + 1)
+
+    # Input nama ikan
+    nama_baru = input("Masukkan nama ikan baru: ")
+
+    # Pilih warna ikan dari daftar yang ada
+    print("\nPilih warna ikan dari daftar yang ada:")
+    for kode, warna in data_warna.items():
+        print(f"{kode}: {warna}")
+    kode_warna = input("Masukkan ID warna ikan yang dipilih: ")
+    if kode_warna not in data_warna:
+        print("ID warna tidak valid, kembali ke menu utama.")
         return
 
-    headers_ikan = ["Kode Ikan", "Nama Ikan", "Warna Ikan", "Jenis Ikan", "Jarak Tempuh"]
-    headers_warna = ["Kode Warna", "Nama Warna"]
-    headers_jenis = ["Kode Jenis", "Nama Jenis"]
+    # Pilih jenis ikan dari daftar yang ada
+    print("\nPilih jenis ikan dari daftar yang ada:")
+    for kode, jenis in data_jenis.items():
+        print(f"{kode}: {jenis}")
+    kode_jenis = input("Masukkan ID jenis ikan yang dipilih: ")
+    if kode_jenis not in data_jenis:
+        print("ID jenis tidak valid, kembali ke menu utama.")
+        return
 
-    # Main GUI
-    root = tk.Toplevel()
-    root.title("Lihat Data")
-    root.configure(bg='#87CEFA')
-    root.geometry("400x300")
+    # Simpan data ke file nama_ikan.txt
+    simpan_data_ke_file("nama_ikan.txt", f"{kode_baru}:{nama_baru},{kode_warna},{kode_jenis}")
 
-    tk.Label(root, text="Pilih Data yang Ingin Ditampilkan", bg="#87CEFA", font=("Arial", 16)).pack(pady=10)
+    # Tambahkan data ke dictionary agar langsung terlihat
+    data_ikan[kode_baru] = {"nama": nama_baru, "id_warna": kode_warna, "id_jenis": kode_jenis}
 
-    # Tombol untuk memilih jenis data
-    tk.Button(root, text="Data Ikan", command=tampilkan_data_ikan, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
-    tk.Button(root, text="Data Warna", command=tampilkan_data_warna, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
-    tk.Button(root, text="Data Jenis", command=tampilkan_data_jenis, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
+    print(f"\nData ikan berhasil ditambahkan: {kode_baru}:{nama_baru}")
+    print(f"Warna: {data_warna[kode_warna]}, Jenis: {data_jenis[kode_jenis]}")
 
-    # Tombol kembali
-    tk.Button(root, text="Kembali", command=root.destroy, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=10)
+    # Memuat ulang data ikan setelah ditambahkan
+    print("\nMemuat ulang data ikan setelah penambahan...")
+    tampil_data(data_ikan, data_warna, data_jenis)  # Menampilkan data terbaru
+
+def tambah_warna(data_warna):
+    """Fungsi untuk menambahkan data warna baru."""
+    print("\n--- Tambah Warna Baru ---")
+
+    # Tentukan kode warna baru
+    if len(data_warna) == 0:
+        kode_baru = "1"
+    else:
+        kode_baru = str(int(max(data_warna.keys(), key=int)) + 1)
+
+    # Input nama warna baru
+    warna_baru = input("Masukkan nama warna baru: ")
+    if not warna_baru:
+        print("Nama warna tidak boleh kosong, kembali ke menu.")
+        return
+
+    # Simpan data ke file nama_warna.txt
+    simpan_data_ke_file("nama_warna.txt", f"{kode_baru}:{warna_baru}")
+
+    # Tambahkan data ke dictionary agar langsung terlihat
+    data_warna[kode_baru] = warna_baru
+    print(f"\nData warna berhasil ditambahkan: {kode_baru}:{warna_baru}")
+
+def tambah_jenis(data_jenis):
+    """Fungsi untuk menambahkan data jenis baru."""
+    print("\n--- Tambah Jenis Baru ---")
+
+    # Tentukan kode jenis baru
+    if len(data_jenis) == 0:
+        kode_baru = "1"
+    else:
+        kode_baru = str(int(max(data_jenis.keys(), key=int)) + 1)
+
+    # Input nama jenis baru
+    jenis_baru = input("Masukkan nama jenis baru: ")
+    if not jenis_baru:
+        print("Nama jenis tidak boleh kosong, kembali ke menu.")
+        return
+
+    # Simpan data ke file nama_jenis.txt
+    simpan_data_ke_file("nama_jenis.txt", f"{kode_baru}:{jenis_baru}")
+
+    # Tambahkan data ke dictionary agar langsung terlihat
+    data_jenis[kode_baru] = jenis_baru
+    print(f"\nData jenis berhasil ditambahkan: {kode_baru}:{jenis_baru}")
+
+def edit_data_ikan(data_ikan, data_warna, data_jenis):
+    """Fungsi untuk mengedit data ikan berdasarkan kode ikan."""
+    print("\n--- Edit Data Ikan ---")
+    
+    # Pilih ikan yang ingin diedit
+    print("\nDaftar Ikan: ")
+    for kode, detail in data_ikan.items():
+        print(f"{kode}: {detail['nama']}")
+    
+    kode_ikan = input("Masukkan kode ikan yang ingin diedit: ")
+    if kode_ikan not in data_ikan:
+        print("Kode ikan tidak ditemukan.")
+        return
+    
+def edit_data_warna(data_warna):
+    print("\n--- Edit Data Warna ---")
+    print("\nDaftar Warna:")
+    for kode, warna in data_warna.items():
+        print(f"{kode}: {warna}")
+    
+    kode_warna = input("Masukkan kode warna yang ingin diedit: ")
+    if kode_warna not in data_warna:
+        print("Kode warna tidak ditemukan.")
+        return
+
+    warna_baru = input("Masukkan nama warna baru: ")
+    data_warna[kode_warna] = warna_baru
+    print(f"Warna dengan kode {kode_warna} berhasil diubah menjadi {warna_baru}.")
+    update_file_warna(data_warna)
+
+def edit_data_jenis(data_jenis):
+    print("\n--- Edit Data Jenis ---")
+    print("\nDaftar Jenis:")
+    for kode, jenis in data_jenis.items():
+        print(f"{kode}: {jenis}")
+    
+    kode_jenis = input("Masukkan kode jenis yang ingin diedit: ")
+    if kode_jenis not in data_jenis:
+        print("Kode jenis tidak ditemukan.")
+        return
+
+    jenis_baru = input("Masukkan nama jenis baru: ")
+    data_jenis[kode_jenis] = jenis_baru
+    print(f"Jenis dengan kode {kode_jenis} berhasil diubah menjadi {jenis_baru}.")
+    update_file_jenis(data_jenis)
+
+
+    # Pilih bagian mana yang akan diedit
+    print("\nPilih data yang ingin diedit:")
+    print("1. Nama Ikan")
+    print("2. Warna Ikan")
+    print("3. Jenis Ikan")
+    pilih_edit = input("Masukkan pilihan Anda: ")
+
+    if pilih_edit == "1":
+        # Edit nama ikan
+        nama_baru = input("Masukkan nama ikan yang baru: ")
+        data_ikan[kode_ikan]["nama"] = nama_baru
+        print(f"Nama ikan dengan kode {kode_ikan} berhasil diubah menjadi {nama_baru}.")
+    elif pilih_edit == "2":
+        # Edit warna ikan
+        print("\nPilih warna ikan dari daftar yang ada:")
+        for kode, warna in data_warna.items():
+            print(f"{kode}: {warna}")
+        kode_warna = input("Masukkan ID warna ikan yang dipilih: ")
+        if kode_warna in data_warna:
+            data_ikan[kode_ikan]["id_warna"] = kode_warna
+            print(f"Warna ikan dengan kode {kode_ikan} berhasil diubah menjadi {data_warna[kode_warna]}.")
+        else:
+            print("ID warna tidak valid.")
+    elif pilih_edit == "3":
+        # Edit jenis ikan
+        print("\nPilih jenis ikan dari daftar yang ada:")
+        for kode, jenis in data_jenis.items():
+            print(f"{kode}: {jenis}")
+        kode_jenis = input("Masukkan ID jenis ikan yang dipilih: ")
+        if kode_jenis in data_jenis:
+            data_ikan[kode_ikan]["id_jenis"] = kode_jenis
+            print(f"Jenis ikan dengan kode {kode_ikan} berhasil diubah menjadi {data_jenis[kode_jenis]}.")
+        else:
+            print("ID jenis tidak valid.")
+    else:
+        print("Pilihan tidak valid.")
+        return
+
+    # Memperbarui data di file
+    update_file_ikan(data_ikan)
+
+    # Menampilkan data setelah diedit
+    print("\nData ikan setelah diedit:")
+    tampil_data(data_ikan, data_warna, data_jenis)
+
+def hapus_data_ikan(data_ikan):
+    """Fungsi untuk menghapus data ikan berdasarkan kode ikan."""
+    print("\n--- Hapus Data Ikan ---")
+    
+    # Pilih ikan yang ingin dihapus
+    print("\nDaftar Ikan:")
+    for kode, detail in data_ikan.items():
+        print(f"{kode}: {detail['nama']}")
+
+    kode_ikan = input("Masukkan kode ikan yang ingin dihapus: ")
+    if kode_ikan not in data_ikan:
+        print("Kode ikan tidak ditemukan.")
+        return
+
+    # Konfirmasi penghapusan
+    konfirmasi = input(f"Apakah Anda yakin ingin menghapus ikan {data_ikan[kode_ikan]['nama']}? (y/n): ")
+    if konfirmasi.lower() != 'y':
+        print("Penghapusan dibatalkan.")
+        return
+
+    # Hapus data ikan dari dictionary
+    del data_ikan[kode_ikan]
+    print(f"Data ikan dengan kode {kode_ikan} telah dihapus.")
+
+    # Memperbarui data di file
+    update_file_ikan(data_ikan)
+
+    # Menampilkan data setelah dihapus
+    print("\nData ikan setelah dihapus:") 
+    tampil_data(data_ikan, data_warna, data_jenis)
+
+def hapus_data_warna(data_warna):
+    """Fungsi untuk menghapus data warna berdasarkan kode warna."""
+    print("\n--- Hapus Data Warna ---")
+    
+    # Tampilkan daftar warna
+    print("\nDaftar Warna:")
+    for kode, warna in data_warna.items():
+        print(f"{kode}: {warna}")
+
+    # Meminta input kode warna
+    kode_warna = input("Masukkan kode warna yang ingin dihapus: ")
+    if kode_warna not in data_warna:
+        print("Kode warna tidak ditemukan.")
+        return
+
+    # Konfirmasi penghapusan
+    warna_terpilih = data_warna[kode_warna]
+    konfirmasi = input(f"Apakah Anda yakin ingin menghapus warna '{warna_terpilih}'? (y/n): ")
+    if konfirmasi.lower() != 'y':
+        print("Penghapusan dibatalkan.")
+        return
+
+    # Hapus data warna dari dictionary
+    del data_warna[kode_warna]
+    print(f"Data warna dengan kode '{kode_warna}' dan nama '{warna_terpilih}' telah dihapus.")
+
+    # Memperbarui data di file
+    update_file_warna(data_warna)
+
+
+
+def hapus_data_jenis(data_jenis):
+    """Fungsi untuk menghapus data jenis berdasarkan kode jenis."""
+    print("\n--- Hapus Data Jenis ---")
+    
+    # Pilih jenis yang ingin dihapus
+    print("\nDaftar Jenis:")
+    for kode, jenis in data_jenis.items():
+        print(f"{kode}: {jenis}")
+
+    kode_jenis = input("Masukkan kode jenis yang ingin dihapus: ")
+    if kode_jenis not in data_jenis:
+        print("Kode jenis tidak ditemukan.")
+        return
+
+    # Konfirmasi penghapusan
+    konfirmasi = input(f"Apakah Anda yakin ingin menghapus jenis {data_jenis[kode_jenis]}? (y/n): ")
+    if konfirmasi.lower() != 'y':
+        print("Penghapusan dibatalkan.")
+        return
+
+    # Hapus data jenis dari dictionary
+    del data_jenis[kode_jenis]
+    print(f"Data jenis dengan kode {kode_jenis} telah dihapus.")
+
+    # Memperbarui data di file
+    update_file_jenis(data_jenis)
+
+def update_file_warna(data_warna):
+    """Memperbarui file nama_warna.txt setelah perubahan data warna."""
+    try:
+        with open("nama_warna.txt", "w") as file:
+            for kode, warna in data_warna.items():
+                file.write(f"{kode}:{warna}\n")
+        print("File warna berhasil diperbarui.")
+    except Exception as e:
+        print(f"Terjadi kesalahan saat memperbarui file warna: {e}")
+
+def update_file_jenis(data_jenis):
+    """Memperbarui file nama_jenis.txt setelah perubahan data jenis."""
+    try:
+        with open("nama_jenis.txt", "w") as file:
+            for kode, jenis in data_jenis.items():
+                file.write(f"{kode}:{jenis}\n")
+        print("File jenis berhasil diperbarui.")
+    except Exception as e:
+        print(f"Terjadi kesalahan saat memperbarui file jenis: {e}")
+
+
+# Main Program
+while True:
+    print("\nMembaca data dari file...")
+    data_ikan = baca_data_ikan("nama_ikan.txt")
+    data_warna = baca_data_file("nama_warna.txt")
+    data_jenis = baca_data_file("nama_jenis.txt")
+
+    pilih = tampil_menu()
+
+    match pilih:
+        case "1":
+            tampil_data(data_ikan, data_warna, data_jenis)
+        case "2":
+            while True:
+                pilih_tambah = tampil_menu_tambah()
+                match pilih_tambah:
+                    case "1":
+                        tambah_data(data_ikan, data_warna, data_jenis)
+                    case "2":
+                        tambah_warna(data_warna)
+                    case "3":
+                        tambah_jenis(data_jenis)
+                    case "4":
+                        break
+                    case _:
+                        print("Pilihan tidak valid.")
+        case "3":
+            while True:
+                pilih_edit = tampil_menu_edit()
+                match pilih_edit:
+                    case "1":
+                        edit_data_ikan(data_ikan, data_warna, data_jenis)
+                    case "2":
+                        edit_data_warna(data_warna)
+                        pass
+                    case "3":
+                        edit_data_jenis(data_jenis)
+                        pass
+                    case "4":
+                        break
+                    case _:
+                        print("Pilihan tidak valid.")
+        case "4":
+            while True:
+                pilih_hapus = tampil_menu_hapus()
+                match pilih_hapus:
+                    case "1":
+                        hapus_data_ikan(data_ikan)
+                    case "2":
+                        hapus_data_warna(data_warna)
+                        pass
+                    case "3":
+                        hapus_data_jenis(data_jenis)
+                        pass
+                    case "4":
+                        break
+                    case _:
+                        print("Pilihan tidak valid.")
+        case "5":
+            print("Keluar dari program.")
+            break
+        case _:
+            print("Pilihan tidak valid, coba lagi.")
+            
+
+ # type: ignore
