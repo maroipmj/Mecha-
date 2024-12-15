@@ -204,15 +204,67 @@ def edit_data_ikan(data_ikan, data_warna, data_jenis):
     """Fungsi untuk mengedit data ikan berdasarkan kode ikan."""
     print("\n--- Edit Data Ikan ---")
     
-    # Pilih ikan yang ingin diedit
+    # Tampilkan daftar ikan
     print("\nDaftar Ikan: ")
     for kode, detail in data_ikan.items():
         print(f"{kode}: {detail['nama']}")
     
+    # Input kode ikan
     kode_ikan = input("Masukkan kode ikan yang ingin diedit: ")
     if kode_ikan not in data_ikan:
         print("Kode ikan tidak ditemukan.")
         return
+    
+    # Tampilkan menu edit
+    print("\nPilih data yang ingin diedit:")
+    print("1. Nama Ikan")
+    print("2. Warna Ikan")
+    print("3. Jenis Ikan")
+    pilih_edit = input("Masukkan pilihan Anda: ")
+
+    if pilih_edit == "1":
+        # Edit nama ikan
+        nama_baru = input("Masukkan nama ikan yang baru: ").strip()
+        if nama_baru:
+            data_ikan[kode_ikan]["nama"] = nama_baru
+            print(f"Nama ikan dengan kode {kode_ikan} berhasil diubah menjadi '{nama_baru}'.")
+        else:
+            print("Nama ikan tidak boleh kosong.")
+            return
+    elif pilih_edit == "2":
+        # Edit warna ikan
+        print("\nPilih warna ikan dari daftar yang ada:")
+        for kode, warna in data_warna.items():
+            print(f"{kode}: {warna}")
+        kode_warna = input("Masukkan ID warna ikan yang dipilih: ").strip()
+        if kode_warna in data_warna:
+            data_ikan[kode_ikan]["id_warna"] = kode_warna
+            print(f"Warna ikan dengan kode {kode_ikan} berhasil diubah menjadi '{data_warna[kode_warna]}'.")
+        else:
+            print("ID warna tidak valid.")
+            return
+    elif pilih_edit == "3":
+        # Edit jenis ikan
+        print("\nPilih jenis ikan dari daftar yang ada:")
+        for kode, jenis in data_jenis.items():
+            print(f"{kode}: {jenis}")
+        kode_jenis = input("Masukkan ID jenis ikan yang dipilih: ").strip()
+        if kode_jenis in data_jenis:
+            data_ikan[kode_ikan]["id_jenis"] = kode_jenis
+            print(f"Jenis ikan dengan kode {kode_ikan} berhasil diubah menjadi '{data_jenis[kode_jenis]}'.")
+        else:
+            print("ID jenis tidak valid.")
+            return
+    else:
+        print("Pilihan tidak valid.")
+        return
+
+    # Memperbarui data di file
+    update_file_ikan(data_ikan)
+
+    # Menampilkan data setelah diedit
+    print("\nData ikan setelah diedit:")
+    tampil_data(data_ikan, data_warna, data_jenis)
     
 def edit_data_warna(data_warna):
     print("\n--- Edit Data Warna ---")
@@ -296,32 +348,46 @@ def hapus_data_ikan(data_ikan):
     """Fungsi untuk menghapus data ikan berdasarkan kode ikan."""
     print("\n--- Hapus Data Ikan ---")
     
-    # Pilih ikan yang ingin dihapus
+    # Tampilkan daftar ikan
     print("\nDaftar Ikan:")
     for kode, detail in data_ikan.items():
         print(f"{kode}: {detail['nama']}")
 
+    # Meminta input kode ikan
     kode_ikan = input("Masukkan kode ikan yang ingin dihapus: ")
     if kode_ikan not in data_ikan:
         print("Kode ikan tidak ditemukan.")
         return
 
     # Konfirmasi penghapusan
-    konfirmasi = input(f"Apakah Anda yakin ingin menghapus ikan {data_ikan[kode_ikan]['nama']}? (y/n): ")
+    ikan_terpilih = data_ikan[kode_ikan]['nama']
+    konfirmasi = input(f"Apakah Anda yakin ingin menghapus ikan '{ikan_terpilih}'? (y/n): ")
     if konfirmasi.lower() != 'y':
         print("Penghapusan dibatalkan.")
         return
 
     # Hapus data ikan dari dictionary
     del data_ikan[kode_ikan]
-    print(f"Data ikan dengan kode {kode_ikan} telah dihapus.")
+    print(f"Data ikan dengan kode '{kode_ikan}' dan nama '{ikan_terpilih}' telah dihapus.")
 
     # Memperbarui data di file
     update_file_ikan(data_ikan)
 
     # Menampilkan data setelah dihapus
-    print("\nData ikan setelah dihapus:") 
+    print("\nData ikan setelah dihapus:")
     tampil_data(data_ikan, data_warna, data_jenis)
+
+def update_file_ikan(data_ikan):
+    """Memperbarui file nama_ikan.txt setelah perubahan data ikan."""
+    try:
+        with open("nama_ikan.txt", "w") as file:
+            for kode, detail in data_ikan.items():
+                # Format: id:nama,id_warna,id_jenis
+                file.write(f"{kode}:{detail['nama']},{detail['id_warna']},{detail['id_jenis']}\n")
+        print("File ikan berhasil diperbarui.")
+    except Exception as e:
+        print(f"Terjadi kesalahan saat memperbarui file ikan: {e}")
+
 
 def hapus_data_warna(data_warna):
     """Fungsi untuk menghapus data warna berdasarkan kode warna."""
