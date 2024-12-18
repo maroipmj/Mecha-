@@ -171,41 +171,6 @@ def edit_data():
         tk.Button(edit_window, text="Simpan", command=simpan_perubahan_jenis, bg="#4682B4", fg="white", font=("Arial", 12)).pack(pady=10)
         tk.Button(edit_window, text="Kembali", command=edit_window.destroy, bg="#4682B4", fg="white", font=("Arial", 12)).pack()
 
-    def edit_jarak_tempuh():
-        def simpan_perubahan_jarak():
-            pilihan = jarak_var.get()
-            if pilihan == "Pilih Jarak Tempuh":
-                messagebox.showerror("Error", "Pilih jarak tempuh untuk diedit.")
-                return
-            nama_baru = entry_nama.get()
-            if not nama_baru:
-                messagebox.showerror("Error", "Nama baru tidak boleh kosong.")
-                return
-            # Ubah nama jarak tempuh
-            data_jarak[nama_baru] = data_jarak.pop(pilihan)
-            update_file("jarak_tempuh.txt", data_jarak)
-            messagebox.showinfo("Info", f"Nama jarak tempuh berhasil diperbarui menjadi {nama_baru}.")
-            edit_window.destroy()
-
-        data_jarak = baca_data_file("jarak_tempuh.txt")
-
-        # Window untuk edit data jarak tempuh
-        edit_window = tk.Toplevel()
-        configure_window(edit_window, "Edit Data Jarak Tempuh")
-
-        tk.Label(edit_window, text="Pilih Jarak Tempuh", bg="#87CEFA", font=("Arial", 12)).pack(pady=5)
-        jarak_var = tk.StringVar(edit_window)
-        jarak_var.set("Pilih Jarak Tempuh")
-        options = list(data_jarak.keys())
-        tk.OptionMenu(edit_window, jarak_var, *options).pack(pady=5)
-
-        tk.Label(edit_window, text="Nama Baru:", bg="#87CEFA", font=("Arial", 12)).pack(pady=5)
-        entry_nama = tk.Entry(edit_window, width=30)
-        entry_nama.pack(pady=5)
-
-        tk.Button(edit_window, text="Simpan", command=simpan_perubahan_jarak, bg="#4682B4", fg="white", font=("Arial", 12)).pack(pady=10)
-        tk.Button(edit_window, text="Kembali", command=edit_window.destroy, bg="#4682B4", fg="white", font=("Arial", 12)).pack()
-
     # Main window
     root = tk.Tk()
     configure_window(root, "Edit Data")
@@ -215,9 +180,7 @@ def edit_data():
     tk.Button(root, text="Edit Data Ikan", command=edit_data_ikan, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
     tk.Button(root, text="Edit Data Warna", command=edit_data_warna, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
     tk.Button(root, text="Edit Data Jenis", command=edit_data_jenis, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
-    tk.Button(root, text="Edit Data Jarak Tempuh", command=edit_jarak_tempuh, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
 
     tk.Button(root, text="Kembali", command=root.destroy, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=10)
 
     root.mainloop()
-    
