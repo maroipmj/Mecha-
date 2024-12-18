@@ -55,6 +55,28 @@ def baca_data_jarak_tempuh(file_path):
     return data
 
 
+# Fungsi untuk membaca transaksi dari file
+def baca_data_transaksi(file_path):
+    transaksi = []
+    with open(file_path, "r") as file:
+        for line in file:
+            line = line.strip()
+            if line:
+                try:
+                    id_transaksi, detail = line.split(":")
+                    tanggal, id_ikan, jarak = detail.split(",")
+                    transaksi.append({
+                        "id": int(id_transaksi),
+                        "tanggal": tanggal.strip(),
+                        "id_ikan": int(id_ikan.strip()),
+                        "jarak": jarak.strip()
+                    })
+                except ValueError:
+                    # Abaikan baris yang tidak sesuai format
+                    continue
+    return transaksi
+
+
 # Fungsi utama untuk menampilkan data
 def lihat_data():
     def tampilkan_tabel(judul, data, headers, row_formatter):
@@ -86,9 +108,9 @@ def lihat_data():
         data_frame = tk.Frame(tabel_window, bg='#87CEFA')
         data_frame.pack(pady=5)
 
-        for row, (kode, detail) in enumerate(data.items(), start=1):
+        for row, detail in enumerate(data, start=1):  # Perubahan: tidak perlu .items() untuk list
             try:
-                values = row_formatter(kode, detail)
+                values = row_formatter(detail)
                 for col, value in enumerate(values):
                     label = tk.Label(data_frame, text=value, borderwidth=1, relief="solid", width=20, bg='#87CEFA', font=("Arial", 12))
                     label.grid(row=row, column=col, sticky="nsew")  # Menambahkan sticky untuk perataan
@@ -104,19 +126,27 @@ def lihat_data():
         tk.Button(tabel_window, text="Kembali", command=tabel_window.destroy, width=20, font=("Arial", 12), bg="#4682B4", fg="white").pack(pady=10)
 
     def tampilkan_data_ikan():
-        tampilkan_tabel("Data Ikan", data_ikan, headers_ikan, lambda kode, detail: [
-            kode,
+        tampilkan_tabel("Data Ikan", data_ikan, headers_ikan, lambda detail: [
+            detail["id"],
             detail.get("nama", "Tidak Diketahui"),
             data_warna.get(detail.get("id_warna", -1), "Tidak Diketahui"),
             data_jenis.get(detail.get("id_jenis", -1), "Tidak Diketahui"),
-            data_jarak.get(kode, "Tidak Diketahui")  # Menambahkan jarak tempuh dalam format string
+            data_jarak.get(detail["id"], "Tidak Diketahui")  # Menambahkan jarak tempuh dalam format string
         ])
 
     def tampilkan_data_warna():
-        tampilkan_tabel("Data Warna", data_warna, headers_warna, lambda kode, nama: [kode, nama])
+        tampilkan_tabel("Data Warna", data_warna, headers_warna, lambda detail: [detail["id"], detail["nama"]])
 
     def tampilkan_data_jenis():
-        tampilkan_tabel("Data Jenis", data_jenis, headers_jenis, lambda kode, nama: [kode, nama])
+        tampilkan_tabel("Data Jenis", data_jenis, headers_jenis, lambda detail: [detail["id"], detail["nama"]])
+
+    def tampilkan_data_transaksi():
+        tampilkan_tabel("Transaksi", data_transaksi, ["ID", "Tanggal", "Nama Ikan", "Jarak Tempuh"], lambda detail: [
+            detail["id"],
+            detail["tanggal"],
+            data_ikan.get(detail["id_ikan"], {}).get("nama", "Tidak Diketahui"),
+            detail["jarak"]
+        ])
 
     # Load data
     try:
@@ -124,6 +154,7 @@ def lihat_data():
         data_warna = baca_data_file("nama_warna.txt")
         data_jenis = baca_data_file("nama_jenis.txt")
         data_jarak = baca_data_jarak_tempuh("jarak_tempuh.txt")  # Membaca data jarak tempuh (dalam format string)
+        data_transaksi = baca_data_transaksi("jarak_tempuh.txt")  # Membaca transaksi
     except FileNotFoundError as e:
         messagebox.showerror("Error", f"File tidak ditemukan: {e.filename}")
         return
@@ -146,9 +177,9 @@ def lihat_data():
     tk.Button(root, text="Data Ikan", command=tampilkan_data_ikan, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
     tk.Button(root, text="Data Warna", command=tampilkan_data_warna, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
     tk.Button(root, text="Data Jenis", command=tampilkan_data_jenis, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
+    tk.Button(root, text="Lihat Transaksi", command=tampilkan_data_transaksi, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
 
     # Tombol kembali
     tk.Button(root, text="Kembali", command=root.destroy, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=10)
 
     root.mainloop()
-
