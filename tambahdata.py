@@ -1,198 +1,217 @@
-def baca_data_ikan(file_name):
-    """Fungsi untuk membaca file nama_ikan.txt dengan format 'id:nama,id_warna,id_jenis'."""
-    data = {}
-    try:
-        with open(file_name, "r") as file:
-            for line in file:
-                line = line.strip()
-                if not line:
-                    continue
-                parts = line.split(":", 1)
-                if len(parts) != 2:
-                    print(f"Baris salah di file {file_name}: {line}")
-                    continue
-                kode = parts[0]
-                detail = parts[1].split(",")  
-                if len(detail) != 3:
-                    print(f"Baris salah di file {file_name}: {line}")
-                    continue
-                data[kode] = {"nama": detail[0], "id_warna": detail[1], "id_jenis": detail[2]}
-    except FileNotFoundError:
-        print(f"File {file_name} tidak ditemukan.")
-    except Exception as e:
-        print(f"Terjadi kesalahan saat membaca file {file_name}: {e}")
-    return data
+import tkinter as tk
+from tkinter import messagebox, ttk
+from tkcalendar import Calendar
+import os
 
-def baca_data_file(file_name):
-    """Fungsi untuk membaca file warna/jenis dengan format 'id:nama'."""
-    data = {}
-    try:
-        with open(file_name, "r") as file:
-            for line in file:
-                line = line.strip()
-                if not line:
-                    continue
-                parts = line.split(":", 1)
-                if len(parts) != 2:
-                    print(f"Baris salah di file {file_name}: {line}")
-                    continue
-                data[parts[0]] = parts[1].strip()
-    except FileNotFoundError:
-        print(f"File {file_name} tidak ditemukan.")
-    except Exception as e:
-        print(f"Terjadi kesalahan saat membaca file {file_name}: {e}")
-    return data
+def tambah_data():
+    def baca_file_data(file_name):
+        """Membaca file data dan mengembalikan dictionary."""
+        data = {}
+        try:
+            # Mengecek apakah file ada
+            if os.path.exists(file_name):
+                with open(file_name, "r") as file:
+                    for line in file:
+                        kode, nama = line.strip().split(":")
+                        data[int(kode)] = nama
+        except Exception as e:
+            messagebox.showerror("Error", f"Error saat membaca file {file_name}: {str(e)}")
+        return data
 
-def simpan_data_ke_file(file_name, data_baru):
-    """Fungsi untuk menambahkan data ke file."""
-    try:
-        with open(file_name, "a") as file:
-            file.write(data_baru + "\n")
-        print(f"Data berhasil ditambahkan ke {file_name}")
-    except Exception as e:
-        print(f"Terjadi kesalahan saat menyimpan data ke file {file_name}: {e}")
+    def dapatkan_id_baru(file_name):
+        """Mengembalikan ID baru berdasarkan ID terakhir di file."""
+        try:
+            if os.path.exists(file_name):
+                with open(file_name, "r") as file:
+                    lines = file.readlines()
+                    if not lines:
+                        return 1  # Jika file kosong, mulai dari ID 1
+                    last_line = lines[-1]
+                    last_id = int(last_line.split(":")[0])
+                    return last_id + 1
+            else:
+                return 1  # Jika file tidak ada, mulai dari ID 1
+        except Exception as e:
+            messagebox.showerror("Error", f"Error saat mendapatkan ID baru dari file {file_name}: {str(e)}")
+            return 1
 
-def tambah_data_ikan(data_ikan, data_warna, data_jenis):
-    """Fungsi untuk menambahkan data ikan baru."""
-    print("\n--- Tambah Data Ikan Baru ---")
+    def tambah_data_ikan():
+        def simpan_ikan():
+            try:
+                kode = dapatkan_id_baru("nama_ikan.txt")  # ID otomatis
+                nama = nama_entry.get().strip()
+                warna = warna_var.get()
+                jenis = jenis_var.get()
 
-    # Tentukan kode ikan baru
-    if len(data_ikan) == 0:
-        kode_baru = "1"
-    else:
-        kode_baru = str(int(max(data_ikan.keys())) + 1)
+                if not nama or warna == "Pilih Warna" or jenis == "Pilih Jenis":
+                    raise ValueError("Semua kolom harus diisi!")
 
-    # Input nama ikan
-    while True:
-        nama_baru = input("Masukkan nama ikan baru: ").strip()
-        if nama_baru:
-            break
-        print("Nama ikan tidak boleh kosong.")
+                # Cari ID warna dan jenis dari nama yang dipilih
+                id_warna = [k for k, v in data_warna.items() if v == warna][0]
+                id_jenis = [k for k, v in data_jenis.items() if v == jenis][0]
 
-    # Pilih warna ikan dari daftar yang ada
-    while True:
-        print("\nPilih warna ikan dari daftar yang ada:")
-        for kode, warna in data_warna.items():
-            print(f"{kode}: {warna}")
-        kode_warna = input("Masukkan ID warna ikan yang dipilih: ").strip()
-        if kode_warna in data_warna:
-            break
-        print("ID warna tidak valid. Silakan coba lagi.")
+                # Simpan data ikan (ID, nama, ID warna, ID jenis) ke file nama_ikan.txt
+                with open("nama_ikan.txt", "a") as file:
+                    file.write(f"{kode}:{nama},{id_warna},{id_jenis}\n")
+                messagebox.showinfo("Sukses", "Data ikan berhasil ditambahkan!")
 
-    # Pilih jenis ikan dari daftar yang ada
-    while True:
-        print("\nPilih jenis ikan dari daftar yang ada:")
-        for kode, jenis in data_jenis.items():
-            print(f"{kode}: {jenis}")
-        kode_jenis = input("Masukkan ID jenis ikan yang dipilih: ").strip()
-        if kode_jenis in data_jenis:
-            break
-        print("ID jenis tidak valid. Silakan coba lagi.")
+                tambah_window.destroy()
+            except ValueError as e:
+                messagebox.showerror("Error", str(e))
+            except KeyError:
+                messagebox.showerror("Error", "Warna atau jenis tidak valid!")
 
-    # Konfirmasi penambahan data
-    print("\nKonfirmasi Data Baru:")
-    print(f"Kode Ikan: {kode_baru}")
-    print(f"Nama Ikan: {nama_baru}")
-    print(f"Warna Ikan: {data_warna[kode_warna]}")
-    print(f"Jenis Ikan: {data_jenis[kode_jenis]}")
-    konfirmasi = input("Apakah data sudah benar? (y/n): ")
-    
-    if konfirmasi.lower() != 'y':
-        print("Penambahan data dibatalkan.")
-        return None
+        # Data warna dan jenis
+        data_warna = baca_file_data("nama_warna.txt")
+        data_jenis = baca_file_data("nama_jenis.txt")
 
-    # Simpan data ke file nama_ikan.txt
-    data_untuk_disimpan = f"{kode_baru}:{nama_baru},{kode_warna},{kode_jenis}"
-    simpan_data_ke_file("nama_ikan.txt", data_untuk_disimpan)
+        # Window untuk tambah data ikan
+        tambah_window = tk.Toplevel()
+        tambah_window.title("Tambah Data Ikan")
+        tambah_window.configure(bg="#87CEFA")
 
-    # Tambahkan data ke dictionary
-    data_ikan[kode_baru] = {
-        "nama": nama_baru, 
-        "id_warna": kode_warna, 
-        "id_jenis": kode_jenis
-    }
+        tk.Label(tambah_window, text="Nama Ikan:", bg="#87CEFA", font=("Arial", 12)).pack(pady=5)
+        nama_entry = tk.Entry(tambah_window, font=("Arial", 12), width=30)
+        nama_entry.pack(pady=5)
 
-    print(f"\nData ikan berhasil ditambahkan: {kode_baru}:{nama_baru}")
-    return data_ikan
+        tk.Label(tambah_window, text="Pilih Warna:", bg="#87CEFA", font=("Arial", 12)).pack(pady=5)
+        warna_var = tk.StringVar()
+        warna_var.set("Pilih Warna")  # Default value
+        warna_dropdown = ttk.OptionMenu(tambah_window, warna_var, *data_warna.values())
+        warna_dropdown.pack(pady=5)
 
-def tambah_warna(data_warna):
-    """Fungsi untuk menambahkan data warna baru."""
-    print("\n--- Tambah Warna Baru ---")
+        tk.Label(tambah_window, text="Pilih Jenis:", bg="#87CEFA", font=("Arial", 12)).pack(pady=5)
+        jenis_var = tk.StringVar()
+        jenis_var.set("Pilih Jenis")  # Default value
+        jenis_dropdown = ttk.OptionMenu(tambah_window, jenis_var, *data_jenis.values())
+        jenis_dropdown.pack(pady=5)
 
-    # Tentukan kode warna baru
-    if len(data_warna) == 0:
-        kode_baru = "1"
-    else:
-        kode_baru = str(int(max(data_warna.keys(), key=int)) + 1)
+        tk.Button(tambah_window, text="Simpan", command=simpan_ikan, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
+        tk.Button(tambah_window, text="Kembali", command=tambah_window.destroy, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
 
-    # Input nama warna baru
-    while True:
-        warna_baru = input("Masukkan nama warna baru: ").strip()
-        if warna_baru:
-            break
-        print("Nama warna tidak boleh kosong.")
+    def tambah_data_warna():
+        def simpan_warna():
+            try:
+                kode = dapatkan_id_baru("nama_warna.txt")
+                warna_baru = warna_entry.get().strip()
 
-    # Konfirmasi penambahan data
-    print("\nKonfirmasi Data Baru:")
-    print(f"Kode Warna: {kode_baru}")
-    print(f"Nama Warna: {warna_baru}")
-    konfirmasi = input("Apakah data sudah benar? (y/n): ")
-    
-    if konfirmasi.lower() != 'y':
-        print("Penambahan data dibatalkan.")
-        return None
+                if not warna_baru:
+                    raise ValueError("Nama warna tidak boleh kosong!")
 
-    # Simpan data ke file nama_warna.txt
-    simpan_data_ke_file("nama_warna.txt", f"{kode_baru}:{warna_baru}")
+                # Simpan warna ke file nama_warna.txt
+                with open("nama_warna.txt", "a") as file:
+                    file.write(f"{kode}:{warna_baru}\n")
 
-    # Tambahkan data ke dictionary
-    data_warna[kode_baru] = warna_baru
-    print(f"\nData warna berhasil ditambahkan: {kode_baru}:{warna_baru}")
-    return data_warna
+                messagebox.showinfo("Sukses", "Data warna berhasil ditambahkan!")
 
-def tambah_jenis(data_jenis):
-    """Fungsi untuk menambahkan data jenis baru."""
-    print("\n--- Tambah Jenis Baru ---")
+                tambah_window.destroy()
+            except ValueError as e:
+                messagebox.showerror("Error", str(e))
 
-    # Tentukan kode jenis baru
-    if len(data_jenis) == 0:
-        kode_baru = "1"
-    else:
-        kode_baru = str(int(max(data_jenis.keys(), key=int)) + 1)
+        tambah_window = tk.Toplevel()
+        tambah_window.title("Tambah Data Warna")
+        tambah_window.configure(bg="#87CEFA")
 
-    # Input nama jenis baru
-    while True:
-        jenis_baru = input("Masukkan nama jenis baru: ").strip()
-        if jenis_baru:
-            break
-        print("Nama jenis tidak boleh kosong.")
+        tk.Label(tambah_window, text="Nama Warna:", bg="#87CEFA", font=("Arial", 12)).pack(pady=5)
+        warna_entry = tk.Entry(tambah_window, font=("Arial", 12), width=30)
+        warna_entry.pack(pady=5)
 
-    # Konfirmasi penambahan data
-    print("\nKonfirmasi Data Baru:")
-    print(f"Kode Jenis: {kode_baru}")
-    print(f"Nama Jenis: {jenis_baru}")
-    konfirmasi = input("Apakah data sudah benar? (y/n): ")
-    
-    if konfirmasi.lower() != 'y':
-        print("Penambahan data dibatalkan.")
-        return None
+        tk.Button(tambah_window, text="Simpan", command=simpan_warna, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
+        tk.Button(tambah_window, text="Kembali", command=tambah_window.destroy, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
 
-    # Simpan data ke file nama_jenis.txt
-    simpan_data_ke_file("nama_jenis.txt", f"{kode_baru}:{jenis_baru}")
+    def tambah_data_jenis():
+        def simpan_jenis():
+            try:
+                kode = dapatkan_id_baru("nama_jenis.txt")
+                jenis_baru = jenis_entry.get().strip()
 
-    # Tambahkan data ke dictionary
-    data_jenis[kode_baru] = jenis_baru
-    print(f"\nData jenis berhasil ditambahkan: {kode_baru}:{jenis_baru}")
-    return data_jenis
+                if not jenis_baru:
+                    raise ValueError("Nama jenis tidak boleh kosong!")
 
-# Contoh cara menggunakan fungsi-fungsi di atas
-if __name__ == "__main__":
-    # Baca data awal
-    data_ikan = baca_data_ikan("nama_ikan.txt")
-    data_warna = baca_data_file("nama_warna.txt")
-    data_jenis = baca_data_file("nama_jenis.txt")
+                # Simpan jenis ke file nama_jenis.txt
+                with open("nama_jenis.txt", "a") as file:
+                    file.write(f"{kode}:{jenis_baru}\n")
 
-    # Contoh penggunaan fungsi tambah data
-    tambah_data_ikan(data_ikan, data_warna, data_jenis)
-    tambah_warna(data_warna)
-    tambah_jenis(data_jenis)
+                messagebox.showinfo("Sukses", "Data jenis berhasil ditambahkan!")
+
+                tambah_window.destroy()
+            except ValueError as e:
+                messagebox.showerror("Error", str(e))
+
+        tambah_window = tk.Toplevel()
+        tambah_window.title("Tambah Data Jenis")
+        tambah_window.configure(bg="#87CEFA")
+
+        tk.Label(tambah_window, text="Nama Jenis:", bg="#87CEFA", font=("Arial", 12)).pack(pady=5)
+        jenis_entry = tk.Entry(tambah_window, font=("Arial", 12), width=30)
+        jenis_entry.pack(pady=5)
+
+        tk.Button(tambah_window, text="Simpan", command=simpan_jenis, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
+        tk.Button(tambah_window, text="Kembali", command=tambah_window.destroy, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
+
+    def tambah_data_transaksi():
+        def simpan_transaksi():
+            try:
+                # Ambil ID ikan yang dipilih
+                kode_ikan = [k for k, v in data_ikan.items() if v == ikan_var.get()][0]
+                tanggal = tanggal_calendar.get_date()  # Sudah dalam format yyyy-mm-dd
+                jarak = jarak_entry.get().strip()
+
+                if not jarak:
+                    raise ValueError("Jarak tidak boleh kosong!")
+
+                # Mendapatkan ID transaksi baru
+                id_transaksi = dapatkan_id_baru("jarak_tempuh.txt")
+
+                # Simpan transaksi ke file
+                transaksi_data = f"{id_transaksi}:{tanggal},{kode_ikan},{jarak}\n"
+                with open("jarak_tempuh.txt", "a") as file:
+                    file.write(transaksi_data)
+
+                messagebox.showinfo("Sukses", "Transaksi berhasil ditambahkan!")
+                tambah_window.destroy()
+
+            except ValueError as e:
+                messagebox.showerror("Error", str(e))
+            except KeyError:
+                messagebox.showerror("Error", "Ikan tidak valid!")
+
+        # Data ikan dari nama_ikan.txt
+        data_ikan = baca_file_data("nama_ikan.txt")
+
+        # Window untuk tambah transaksi
+        tambah_window = tk.Toplevel()
+        tambah_window.title("Tambah Transaksi")
+        tambah_window.configure(bg="#87CEFA")
+
+        tk.Label(tambah_window, text="Pilih Ikan:", bg="#87CEFA", font=("Arial", 12)).pack(pady=5)
+        ikan_var = tk.StringVar()
+        ikan_var.set("Pilih Ikan")  # Default value
+        ikan_dropdown = ttk.OptionMenu(tambah_window, ikan_var, *data_ikan.values())
+        ikan_dropdown.pack(pady=5)
+
+        tk.Label(tambah_window, text="Pilih Tanggal:", bg="#87CEFA", font=("Arial", 12)).pack(pady=5)
+        tanggal_calendar = Calendar(tambah_window, selectmode="day", date_pattern="yyyy-mm-dd")
+        tanggal_calendar.pack(pady=5)
+
+        tk.Label(tambah_window, text="Jarak (km):", bg="#87CEFA", font=("Arial", 12)).pack(pady=5)
+        jarak_entry = tk.Entry(tambah_window, font=("Arial", 12), width=30)
+        jarak_entry.pack(pady=5)
+
+        tk.Button(tambah_window, text="Simpan", command=simpan_transaksi, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
+        tk.Button(tambah_window, text="Kembali", command=tambah_window.destroy, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
+
+    def menu_tambah_data():
+        menu_window = tk.Toplevel()
+        menu_window.title("Pilih Data yang Ingin Ditambahkan")
+        menu_window.configure(bg="#87CEFA")
+
+        tk.Label(menu_window, text="Pilih Data yang Ingin Ditambahkan", font=("Arial", 16), bg="#87CEFA").pack(pady=10)
+
+        tk.Button(menu_window, text="Tambah Data Ikan", command=lambda: [menu_window.destroy(), tambah_data_ikan()], bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
+        tk.Button(menu_window, text="Tambah Data Warna", command=lambda: [menu_window.destroy(), tambah_data_warna()], bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
+        tk.Button(menu_window, text="Tambah Data Jenis", command=lambda: [menu_window.destroy(), tambah_data_jenis()], bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
+        tk.Button(menu_window, text="Tambah Transaksi", command=lambda: [menu_window.destroy(), tambah_data_transaksi()], bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
+        tk.Button(menu_window, text="Kembali", command=menu_window.destroy, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=10)
+
+    menu_tambah_data()
