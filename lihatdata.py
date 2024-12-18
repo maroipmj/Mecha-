@@ -188,7 +188,7 @@ def lihat_data():
     headers_ikan = ["Kode Ikan", "Nama Ikan", "Warna Ikan", "Jenis Ikan"]
     headers_warna = ["Kode Warna", "Nama Warna"]
     headers_jenis = ["Kode Jenis", "Nama Jenis"]
-    headers_transaksi = ["Kode Transaksi", "Tanggal", "Nama Ikan", "Jarak Tempuh"]
+    headers_transaksi = ["No", "Tanggal", "Nama Ikan", "Jarak Tempuh"]
 
     # Main GUI
     root = tk.Toplevel()
