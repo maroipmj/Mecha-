@@ -127,37 +127,6 @@ def hapus_data():
         tk.Button(hapus_window, text="Hapus", command=konfirmasi_hapus, bg="#4682B4", fg="white", font=("Arial", 12)).pack(pady=10)
         tk.Button(hapus_window, text="Kembali", command=hapus_window.destroy, bg="#4682B4", fg="white", font=("Arial", 12)).pack()
 
-    def hapus_jarak_tempuh():
-        def konfirmasi_hapus():
-            pilihan = jarak_var.get()
-            if pilihan == "Pilih Jarak Tempuh":
-                messagebox.showerror("Error", "Pilih jarak tempuh untuk dihapus.")
-                return
-            # Cari ID jarak berdasarkan detail jarak yang dipilih
-            id_jarak = data_jarak[pilihan]  # Ambil ID berdasarkan detail yang dipilih
-            konfirmasi = messagebox.askyesno("Konfirmasi", f"Apakah Anda yakin ingin menghapus jarak tempuh '{pilihan}'?")
-            if konfirmasi:
-                del data_jarak[pilihan]  # Hapus berdasarkan detail jarak
-                update_file("jarak_tempuh.txt", data_jarak)  # Update file
-                messagebox.showinfo("Info", f"Jarak tempuh '{pilihan}' berhasil dihapus.")
-                hapus_window.destroy()
-
-        data_jarak = baca_data_file("jarak_tempuh.txt")
-
-        hapus_window = tk.Toplevel()
-        configure_window(hapus_window, "Hapus Jarak Tempuh")
-
-        tk.Label(hapus_window, text="Pilih Jarak Tempuh", bg="#87CEFA", font=("Arial", 12)).pack(pady=5)
-        jarak_var = tk.StringVar(hapus_window)
-        jarak_var.set("Pilih Jarak Tempuh")
-        
-        # Menampilkan hanya detail jarak tempuh di dropdown (tanpa ID)
-        options = list(data_jarak.keys())  # Ambil hanya detail jarak sebagai pilihan
-        tk.OptionMenu(hapus_window, jarak_var, *options).pack(pady=5)
-
-        tk.Button(hapus_window, text="Hapus", command=konfirmasi_hapus, bg="#4682B4", fg="white", font=("Arial", 12)).pack(pady=10)
-        tk.Button(hapus_window, text="Kembali", command=hapus_window.destroy, bg="#4682B4", fg="white", font=("Arial", 12)).pack()
-
     # Main window
     root = tk.Tk()
     configure_window(root, "Hapus Data")
@@ -167,7 +136,6 @@ def hapus_data():
     tk.Button(root, text="Hapus Data Ikan", command=hapus_data_ikan, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
     tk.Button(root, text="Hapus Data Warna", command=hapus_data_warna, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
     tk.Button(root, text="Hapus Data Jenis", command=hapus_data_jenis, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
-    tk.Button(root, text="Hapus Jarak Tempuh", command=hapus_jarak_tempuh, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=5)
 
     tk.Button(root, text="Kembali", command=root.destroy, bg="#4682B4", fg="white", font=("Arial", 12), width=20).pack(pady=10)
 
