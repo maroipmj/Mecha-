@@ -4,19 +4,18 @@ from tkcalendar import Calendar
 import os
 
 def tambah_data():
-    def baca_file_data(file_name):
-        """Membaca file data dan mengembalikan dictionary."""
+    def baca_file_data(file_name):    
         data = {}
         try:
-            # Mengecek apakah file ada
             if os.path.exists(file_name):
                 with open(file_name, "r") as file:
                     for line in file:
-                        kode, nama = line.strip().split(":")
-                        data[int(kode)] = nama
+                        if ":" in line:  # Cek apakah ada separator ":"
+                            kode, nama = line.strip().split(":")
+                            data[int(kode)] = nama
         except Exception as e:
             messagebox.showerror("Error", f"Error saat membaca file {file_name}: {str(e)}")
-        return data
+        return data                    
 
     def dapatkan_id_baru(file_name):
         """Mengembalikan ID baru berdasarkan ID terakhir di file."""
